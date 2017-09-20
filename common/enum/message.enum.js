@@ -1,4 +1,7 @@
 const MESSAGES_ENUM = {
+    /*FIELDS*/
+    fieldUsername: 'Login',
+    fieldPassword: 'Senha',
     /*MESSAGES SERVER*/
     server401: 'Acesso não autorizado',
     server403: 'Erro na autenticação, verifique os dados e tente novamente mais tarde',

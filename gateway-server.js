@@ -6,14 +6,14 @@ require('annotation-js');
 global.annotationsDebug = false;
 
 console.log(chalk.blue.bold('#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-#'));
-console.log(chalk.blue.bold(' GRUPO GNC'));
+console.log(chalk.blue.bold(' Node Server'));
 console.log(chalk.blue.bold('#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-#'));
 console.log('Informaçcoes Tecnicas');
 console.log('#####################');
 console.log('Protocolo: REST');
 console.log('Formato  : JSON');
 console.log('Versao   : 1.0');
-console.log('Empresa Responsável: Grupo GNC Online');
+console.log('Empresa Responsável: Node Server Online');
 console.log(chalk.blue.bold('----------------------------------------------------------------------------------'));
 console.log(chalk.white.bgGreen.bold('Inicializando Gateway'));
 console.log('Inicializando variaveis...');
@@ -85,7 +85,7 @@ function setDependencies() {
 	express = require('express');
 	helmet = require('helmet')
 	bodyParser = require('body-parser');
-	ActiveDirectory = require('activedirectory');
+    //ActiveDirectory = require('activedirectory');
 
 	global.mail = mail;
 	global.path = path;
@@ -96,7 +96,7 @@ function setDependencies() {
 	global.config = config;
 
 	//LDAP
-	global.AD = new ActiveDirectory(global.config.ldap);
+	//global.AD = new ActiveDirectory(global.config.ldap);
 
 	global.interceptor = interceptor;
 
@@ -147,8 +147,9 @@ function configServer() {
 	let Factory = new require('./common/resource-factory')(app, httpOptions);
 
 	/*ENTRY POINTS*/
-	Factory.create(BasePath + '/login/Login.service.js');
-	Factory.create(BasePath + '/user/User.service.js');
+	
+	Factory.create(path.resolve(__dirname, './app/resources/login/Login.service.js'));
+
 
 }
 
@@ -176,9 +177,9 @@ function startServer() {
 	// swagger definition
 	var swaggerDefinition = {
 		info: {
-			title: 'NodeServer - APIs',
+			title: 'domain - APIs',
 			version: '1.0.0',
-			description: 'Lista de entry points',
+			description: 'Lista de APIs de integração do Node Server.',
 		},
 		host: serverIP + ':' + config.server.port,
 		basePath: '/',
@@ -189,7 +190,6 @@ function startServer() {
 		apis: [
 			/*DOCUMENTATION*/
 			'./app/resources/login/*.js',
-			'./app/resources/user/*.js',
 		],
 	};
 

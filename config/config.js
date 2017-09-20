@@ -2,7 +2,7 @@
 
 var config = {
     app: {
-        name: 'NodeServer-API',
+        name: 'Node-Server',
         // Loaded after the app boot
         actualName: ''
     },
@@ -11,12 +11,12 @@ var config = {
     loadedRoutes: [],
     encoding: 'utf8',
     ldap: {
-        url: 'ldap://host:port',
-        baseDN: 'dc=dcname,dc=dcname',
-        username: 'username@domain',
+        url: 'ldap://10.200.1.10:389',
+        baseDN: 'dc=domain,dc=local',
+        username: 'user@domain.local',
         password: 'password'
     },
-    keyRequestAutentication: 'password',
+    keyRequestAutentication: '<PASSWORD>',
     server: {
         port: 9090,
         // Loaded after the app boot
@@ -26,17 +26,16 @@ var config = {
         maxRows: 1000,
         mail: {
             service: 'smtp',
-            host: 'localhost',
+            host: '<HOST>',
             port: 587,
             auth: {
-                user: 'username',
-                pass: 'password'
+                user: '<USER>',
+                pass: '<PASSWORD>'
             },
-            subjectPrefix: 'NodeServerJR | ',
+            subjectPrefix: 'Node-Server | ',
             sendEmail: true, // para desabilitar envio de email: false.
-            overrideFrom: 'no-reply@domain',
-            overrideTo: 'nodeserver@domain',
-            domain:'domain',
+            overrideFrom: 'no-reply@domain.com.br',
+            overrideTo: 'contact@domain.com.br'
         }
     },
     paths: {
@@ -51,7 +50,7 @@ var config = {
         // file, console, all
         type: 'all',
         file: {
-            path: './gateway.log'
+            path: './output-server.log'
         }
     },
     resources: {
@@ -73,3 +72,4 @@ var config = {
 module.exports = function () {
     return config;
 };
+

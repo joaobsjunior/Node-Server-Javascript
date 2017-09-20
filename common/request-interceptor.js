@@ -64,7 +64,7 @@ exports = module.exports = () => {
         });
     }
     var checkAuth = (username, password, res, groups, callback) => {
-        global.AD.authenticate(username + '@' + global.config.server.mail.domain, password, (err, auth) => {
+        global.AD.authenticate(username + '@domain.local', password, (err, auth) => {
             var callbackLocal = (resp) => {
                 callback(false, resp);
             }
@@ -91,13 +91,14 @@ exports = module.exports = () => {
     };
     return {
         authenticate: (req, res, next) => {
+            res.socket.setTimeout(7200000);
             var isMobile = AppUtil.isMobile(req.headers['user-agent']);
             var device = isMobile ? 'mobile' : 'desktop';
             var projectName = _.filter(projectEnum, function (o) {
                 return o.id == req.headers.project;
             });
             projectName = projectName[0] || {};
-            console.log("[RESQUEST] - URL: [" + req.method.toUpperCase() + "] '" + req.originalUrl + "' | USER: '" + ((req.headers.username) ? req.headers.username : '##') + "' | PROJECT: '" + projectName.name + "' | DEVICE: '" + device + "'");
+            log.info("[RESQUEST] - URL: ["+req.method.toUpperCase()+"] '" + req.originalUrl + "' | USER: '" + ((req.headers.username) ? req.headers.username : '##') + "' | PROJECT: '" + projectName.name + "' | DEVICE: '" + device + "'");
             var path = req.route.path;
             var groups = [];
             var groupADArray = [];

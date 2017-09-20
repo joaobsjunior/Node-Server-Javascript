@@ -8,7 +8,7 @@
             "type": "node",
             "request": "launch",
             "name": "Launch Program",
-            "program": "${workspaceRoot}\\gateway-server.js"
+            "program": "${workspaceRoot}/gateway-server.js"
         },
         {
             "type": "node",

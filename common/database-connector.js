@@ -191,10 +191,16 @@ exports = module.exports = () => {
                 });
             };
             if(server.ssh.request){
+                if(server.ssh.server){
+                    exec();
+                    return;
+                }
+                server.ssh.config.keepAlive = true;
                 var sshServer = tunnel(server.ssh.config, function (err, sshServer) {
                     if (err) {
                         respData.errorResponse(err, callbackBefore);
                     }else{
+                        server.ssh.server = sshServer;
                         exec();
                     }
                 });

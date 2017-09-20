@@ -4,7 +4,7 @@
 //let oracledb = require('oracledb');
 
 // common
-let dbEngine = new require('../../../common/database-connector')();
+let dbEngine = require('../../../common/database-connector')();
 let sqlType = require('../../../common/enum/sqltype.enum');
 const dbConfig = require('../../../config/dbconfig');
 const dbGeneric = require('../../../common/database-generic');
@@ -21,14 +21,15 @@ let Message = require('../../../common/model/Message.model');
 const c_COMMAND_LOGIN = "";
 
 class LoginRepository {
-  constructor() { }
+  constructor() {}
 
   // LOGIN
   loginData(login = new Login(), res, callback) {
     var username = login.username;
     var password = login.password;
-    var userData = null;
-    global.AD.authenticate(username + '@' + global.config.server.mail.domain, password, (err, auth) => {
+    var userData = {};
+    userData.mail = "";
+    /*global.AD.authenticate(username + '@domain.local', password, (err, auth) => {
       if (auth) {
         var query = '(&(objectClass=user)(sAMAccountName=' + username + '))';
         global.AD.find(query, function (err, results) {
@@ -46,7 +47,7 @@ class LoginRepository {
         error.message = messageEnum.msg07;
         AppUtil.errorResponse(error, res, 403, callback);
       }
-    });
+    });*/
 
     function callbackDB() {
       var responseData = {

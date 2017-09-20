@@ -1,7 +1,7 @@
 node_modules/
 .history/
 npm-debug.log
-gateway.log
+output-server.log
 .DS_Store
-lock.json
+lock/
 package-lock.json

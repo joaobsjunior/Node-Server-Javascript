@@ -1,0 +1,360 @@
+<html>
+
+<HEAD>
+    <TITLE></TITLE>
+    <STYLE>
+        td.BoletoCodigoBanco {
+            font-size: 6mm;
+            font-family: arial, verdana;
+            font-weight: bold;
+            FONT-STYLE: italic;
+            text-align: center;
+            vertical-align: bottom;
+            border-bottom: 0.15mm solid #000000;
+            border-right: 0.15mm solid #000000;
+            padding-bottom: 1mm
+        }
+        
+        td.BoletoLogo {
+            border-bottom: 0.15mm solid #000000;
+            border-right: 0.15mm solid #000000;
+            text-align: center;
+            height: 10mm
+        }
+        
+        td.BoletoLinhaDigitavel {
+            font-size: 4mm;
+            font-family: arial, verdana;
+            font-weight: bold;
+            text-align: center;
+            vertical-align: bottom;
+            border-bottom: 0.15mm solid #000000;
+            padding-bottom: 1mm;
+        }
+        
+        td.BoletoTituloEsquerdo {
+            font-size: 0.3cm;
+            font-family: arial, verdana;
+            padding-left: 1mm;
+            border-right: 0.15mm solid #000000;
+            text-align: left;
+            padding-top:0.5mm;
+            padding-bottom:0.5mm;
+        }
+        
+        td.BoletoTituloDireito {
+            font-size: 3mm;
+            font-family: arial, verdana;
+            padding-left: 1mm;
+            text-align: left;
+            padding-top:1mm;
+            padding-bottom:1mm;
+        }
+        
+        td.BoletoValorEsquerdo {
+            font-size: 3mm;
+            font-family: arial, verdana;
+            text-align: left;
+            border-right: 0.15mm solid #000000;
+            font-weight: bold;
+            border-bottom: 0.15mm solid #000000;
+            padding-top: 1mm;
+            padding-left: 1mm;
+            padding-bottom:1.5mm;
+        }
+        
+        td.BoletoValorDireito {
+            font-size: 3mm;
+            font-family: arial, verdana;
+            text-align: right;
+            padding-right: 3mm;
+            padding-top: 1mm;
+            border-bottom: 0.15mm solid #000000;
+            font-weight: bold;
+            padding-bottom:1.5mm;
+        }
+        
+        td.BoletoTituloSacado {
+            font-size: 3mm;
+            font-family: arial, verdana;
+            padding-left: 0.15mm;
+            vertical-align: top;
+            padding-top: 0.15mm;
+            text-align: left;
+            padding-top: 1mm;
+            padding-left: 1mm;
+        }
+        
+        td.BoletoValorSacado {
+            font-size: 3mm;
+            font-family: arial, verdana;
+            font-weight: bold;
+            text-align: left;
+            padding-top: 1mm;
+            padding-left: 1mm;
+        }
+        
+        td.BoletoTituloSacador {
+            font-size: 3mm;
+            font-family: arial, verdana;
+            padding-left: 0.15mm;
+            vertical-align: bottom;
+            padding-bottom: 0.8mm;
+            border-bottom: 0.15mm solid #000000
+        }
+        
+        td.BoletoValorSacador {
+            font-size: 3mm;
+            font-family: arial, verdana;
+            vertical-align: bottom;
+            padding-bottom: 0.15mm;
+            border-bottom: 0.15mm solid #000000;
+            font-weight: bold;
+            text-align: left
+        }
+        
+        td.BoletoPontilhado {
+            border-top: 0.3mm dashed #000000;
+            font-size: 1mm
+        }
+        
+        .BoletoInstrucoes {
+            padding:2mm;
+            font-size: 3mm;
+            font-family: verdana, arial
+        }
+        
+        .barcode {
+            padding: 10px;
+        }
+        
+        .barcode-line {
+            height: 50px;
+            display: inline-block;
+            float: left;
+        }
+        
+        td.BoletoTituloEsquerdo:first-child,
+        td.BoletoValorEsquerdo:first-child {
+            border-left: 0.15mm solid #000;
+        }
+        
+        td.BoletoTituloDireito:last-child,
+        td.BoletoValorDireito:last-child {
+            border-right: 0.15mm solid #000;
+        }
+        
+        td.BoletoValorDireito.fixBorder,
+        td.BoletoValorEsquerdo.fixBorder {
+            border-right: none !important;
+            border-left: none !important;
+        }
+        
+        .text-left {
+            text-align: left !important;
+        }
+        .text-center {
+            text-align: center !important;
+        }
+        .bgDestaque {
+            background-color: #e4e4e4;
+        }
+        
+    </STYLE>
+</HEAD>
+
+<BODY>
+
+    <P align=center>
+        <TABLE cellSpacing=0 cellPadding=0 border=0 class=Boleto>
+
+            <TR>
+                <TD style='width: 0.9cm'></TD>
+                <TD style='width: 1cm'></TD>
+                <TD style='width: 1.9cm'></TD>
+
+                <TD style='width: 0.5cm'></TD>
+                <TD style='width: 1.3cm'></TD>
+                <TD style='width: 0.8cm'></TD>
+                <TD style='width: 1cm'></TD>
+
+                <TD style='width: 1.9cm'></TD>
+                <TD style='width: 1.9cm'></TD>
+
+                <TD style='width: 3.8cm'></TD>
+
+                <TD style='width: 3.8cm'></TD>
+                <tr>
+                    <td colspan=11 class=BoletoInstrucoes>
+                        {{modeloEmissao.textoOrientacaoSuperior}}
+                    </td>
+                </tr>
+            </TR>
+            <tr>
+                <td colspan=11 class=BoletoPontilhado>&nbsp;</td>
+            </tr>
+
+            <tr>
+                <td colspan=8 align=left class="BoletoValorEsquerdo fixBorder text-left">CEDENTE: {{cedente.empresa.razaoSocial}}</td>
+                <td colspan=3 class="BoletoValorDireito fixBorder">RECIBO SACADO</td>
+            </tr>
+            <tr>
+                <td colspan=8 class=BoletoTituloEsquerdo>Nome do cliente</td>
+                <td colspan=2 class="BoletoTituloEsquerdo">Data de Vencimento</td>
+                <td colspan=1 class=BoletoTituloEsquerdo>Valor cobrado</td>
+            </tr>
+            <tr>
+                <td colspan=8 class=BoletoValorEsquerdo>&nbsp;{{sacado.nome}}</td>
+                <td colspan=2 class="BoletoValorEsquerdo">&nbsp;{{dataVencimento}}</td>
+                <td colspan=1 class=BoletoValorEsquerdo>&nbsp;{{valorCobrado}}</td>
+            </tr>
+            <tr>
+                <td colspan=4 class=BoletoTituloEsquerdo valign="top">Agencia/Código do cedente</td>
+                <td colspan=4 class=BoletoTituloEsquerdo valign="top">Nosso número</td>
+                <td colspan=3 class='BoletoTituloEsquerdo text-center' valign="top">Autenticação Mecânica</td>
+            </tr>
+            <tr>
+                <td colspan=4 class=BoletoValorEsquerdo>&nbsp;{{cedente.numeroAgencia}}/{{cedente.numeroCedente}}-{{cedente.numeroDigitoCedente}}</td>
+                <td colspan=4 class=BoletoValorEsquerdo>&nbsp;{{nossoNumero}}</td>
+                <td colspan=3 class=BoletoValorEsquerdo>&nbsp;</td>
+            </tr>
+
+            <tr>
+                <td colspan=11>&nbsp;</td>
+            </tr>
+            <tr>
+                <td colspan=11 class=BoletoPontilhado>&nbsp;</td>
+            </tr>
+            <tr>
+                <td colspan=11>&nbsp;</td>
+            </tr>
+            <TR>
+                <TD colspan=4 class=BoletoLogo><img src='{{urlLogoBanco}}'></TD>
+                <TD colspan=2 class=BoletoCodigoBanco>{{codigoBanco}}</TD>
+                <TD colspan=6 class=BoletoLinhaDigitavel>{{linhaDigitavel}}</TD>
+            </TR>
+            <TR>
+                <TD colspan=10 class=BoletoTituloEsquerdo>Local de Pagamento</TD>
+                <TD class="BoletoTituloDireito bgDestaque">Vencimento</TD>
+            </TR>
+            <TR>
+                <TD colspan=10 class=BoletoValorEsquerdo style='text-align: left; padding-left : 0.1cm'>{{modeloEmissao.textoLocalPagemento}}</TD>
+                <TD class="BoletoValorDireito bgDestaque">{{dataVencimento}}</TD>
+            </TR>
+            <TR>
+                <TD colspan=10 class=BoletoTituloEsquerdo>Cedente</TD>
+                <TD class=BoletoTituloDireito>Agência/Código do Cedente</TD>
+            </TR>
+            <TR>
+                <TD colspan=10 class=BoletoValorEsquerdo style='text-align: left; padding-left : 0.1cm'>
+                    {{cedente.empresa.razaoSocial}} - CNPJ: {{cedente.empresa.documentoEmpresa.numero}}
+                    <BR/>{{cedente.empresa.endereco.logradouro}},{{cedente.empresa.endereco.numeroLogradouro}}, {{cedente.empresa.endereco.bairro}}, {{cedente.empresa.endereco.municipio.nome}}-{{cedente.empresa.endereco.municipio.estado}} - {{cedente.empresa.endereco.cep}}
+                </TD>
+                <TD class=BoletoValorDireito>{{cedente.numeroAgencia}}/{{cedente.numeroCedente}}-{{cedente.numeroDigitoCedente}}</TD>
+            </TR>
+            <TR>
+                <TD colspan=3 class=BoletoTituloEsquerdo>Data do Documento</TD>
+                <TD colspan=4 class=BoletoTituloEsquerdo>Número do Documento</TD>
+                <TD class=BoletoTituloEsquerdo>Espécie</TD>
+                <TD class=BoletoTituloEsquerdo>Aceite</TD>
+                <TD class=BoletoTituloEsquerdo>Data do Processamento</TD>
+                <TD class=BoletoTituloDireito>Nosso Número</TD>
+            </TR>
+            <TR>
+                <TD colspan=3 class=BoletoValorEsquerdo>{{dataDocumento}}</TD>
+                <TD colspan=4 class=BoletoValorEsquerdo>{{numeroDocumento}}</TD>
+                <TD class=BoletoValorEsquerdo>{{cedente.especieDocumento}}</TD>
+                <TD class=BoletoValorEsquerdo>{{flgAceite}}</TD>
+                <TD class=BoletoValorEsquerdo>{{dataProcessamento}}</TD>
+                <TD class=BoletoValorDireito>{{nossoNumero}}</TD>
+            </TR>
+            <TR>
+                <TD colspan=3 class=BoletoTituloEsquerdo>Uso do Banco</TD>
+                <TD colspan=2 class=BoletoTituloEsquerdo>Carteira</TD>
+                <TD colspan=2 class=BoletoTituloEsquerdo>Moeda</TD>
+                <TD colspan=2 class=BoletoTituloEsquerdo>Quantidade</TD>
+                <TD class=BoletoTituloEsquerdo>(x) Valor</TD>
+                <TD class="BoletoTituloDireito bgDestaque">(=) Valor do Documento</TD>
+            </TR>
+            <TR>
+                <TD colspan=3 class=BoletoValorEsquerdo>&nbsp;{{usoDoBanco}}</TD>
+                <TD colspan=2 class=BoletoValorEsquerdo>{{cedente.codigoCarteira}}</TD>
+                <TD colspan=2 class=BoletoValorEsquerdo>{{siglaMoeda}}</TD>
+                <TD colspan=2 class=BoletoValorEsquerdo>&nbsp;{{quantidade}}</TD>
+                <TD class=BoletoValorEsquerdo>&nbsp;{{valor}}</TD>
+                <TD class="BoletoValorDireito bgDestaque">{{valorDocumento}}</TD>
+            </TR>
+            <TR>
+                <TD colspan=10 class=BoletoTituloEsquerdo>Instruções <small>(Texto de responsabilidade do cedente)</small></TD>
+                <TD class=BoletoTituloDireito>(-) Desconto</TD>
+            </TR>
+            <TR>
+                <TD colspan=10 rowspan=9 class=BoletoValorEsquerdo style='text-align: left; vertical-align:top; padding-left : 0.1cm'>{{modeloEmissao.textoOrientacaoInterna}}</TD>
+                <TD class=BoletoValorDireito>&nbsp;{{desconto}}</TD>
+            </TR>
+            <TR>
+                <TD class=BoletoTituloDireito>(-) Outras Deduções/Abatimento</TD>
+            </TR>
+            <TR>
+                <TD class=BoletoValorDireito>&nbsp;{{outrasDeducoes}}</TD>
+            </TR>
+            <TR>
+                <TD class=BoletoTituloDireito>(+) Mora/Multa/Juros</TD>
+            </TR>
+            <TR>
+                <TD class=BoletoValorDireito>&nbsp;{{moraMultaJuros}}</TD>
+            </TR>
+            <TR>
+                <TD class=BoletoTituloDireito>(+) Outros Acréscimos</TD>
+            </TR>
+            <TR>
+                <TD class=BoletoValorDireito>&nbsp;{{outrosAcrescimos}}</TD>
+            </TR>
+            <TR>
+                <TD class=BoletoTituloDireito>(=) Valor Cobrado</TD>
+            </TR>
+            <TR>
+                <TD class=BoletoValorDireito>&nbsp;{{valorCobrado}}</TD>
+            </TR>
+            <TR>
+                <TD rowspan=3 colspan=3 Class=BoletoTituloSacado>
+                    Sacado:
+                    <br/>
+                    Sacador / Avalista:
+                </TD>
+                <TD colspan=6 Class=BoletoValorSacado>{{sacado.nome}} </TD>
+                <TD colspan=2 Class=BoletoValorSacado>CPF: {{sacado.cpf}}</TD>
+            </TR>
+            <TR>
+                <TD colspan=6 Class=BoletoValorSacado>{{sacado.endereco.logradouro}}, {{sacado.endereco.numeroLogradouro}}, {{sacado.endereco.bairro}}</TD>
+                <TD colspan=4 Class=BoletoValorSacado>Email: {{sacado.email}}</TD>
+            </TR>
+            <TR>
+                <TD colspan=10 Class=BoletoValorSacado>{{sacado.endereco.municipio.nome}} - {{sacado.endereco.municipio.estado}}&nbsp;&nbsp;&nbsp;{{sacado.endereco.cep}}</TD>
+            </TR>
+            <TR>
+                <TD colspan=11 Class=BoletoValorSacador>&nbsp;</TD>
+            </TR>
+            <TR>
+                <TD colspan=11 class=BoletoTituloDireito style='text-align: right; padding-right: 0.1cm'>Ficha de Compensação - Autenticação Mecânica</TD>
+            </TR>
+            <TR>
+                <TD colspan=11 height=50 valign=center class='barcode'>
+                    {{^barcodeRenderBmp}}
+                        {{#bcList}}
+                            <img class="barcode-line" src="{{url}}" width="{{width}}" height="{{height}}" />
+                        {{/bcList}}
+                    {{/barcodeRenderBmp}}
+                    {{#barcodeRenderBmp}}
+                        <img class="barcode-img" src="data:image/bmp;base64,{{barcode_data}}" width="405" height="50" border='0'/>
+                    {{/barcodeRenderBmp}}
+                </TD>
+            </TR>
+            <tr>
+                <td colspan=11 class=BoletoPontilhado>&nbsp;</td>
+            </tr>
+        </TABLE>
+    </P>
+</BODY>
+
+</HTML>
