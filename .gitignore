@@ -1,0 +1,7 @@
+node_modules/
+.history/
+npm-debug.log
+gateway.log
+.DS_Store
+lock.json
+package-lock.json
