@@ -8,7 +8,7 @@ exports = module.exports = () => {
             if (Object.keys(query).length === 0) return '';
             
             let queryString = '?';
-            for (var propName in query) {
+            for (let propName in query) {
                 if (query.hasOwnProperty(propName)) {
                     console.log(propName, query[propName]);
                     queryString += (queryString=='?'?'':'&')+propName+'='+query[propName];
@@ -20,7 +20,7 @@ exports = module.exports = () => {
             // options.method = verb;
 			// console.log(">>> headers: "+JSON.stringify(options));
 
-            var dataResponse = "";
+            let dataResponse = "";
             let _options = {
                 hostname: options.hostName,
                 port: options.port,

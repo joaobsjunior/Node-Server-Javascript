@@ -1,8 +1,8 @@
-var java;
-var path = require('path');
-var _ = require('lodash');
+let java;
+let path = require('path');
+let _ = require('lodash');
 let appUtil = require('../common/app-util');
-var numRows = 5000;
+let numRows = 5000;
 
 class JDBCResultSet {
     constructor(rs, _java) {
@@ -10,20 +10,20 @@ class JDBCResultSet {
         java = _java;
     }
     getObject() {
-        var sqlTypes = java.import('java.sql.Types');
-        var rsmd = this.rs.getMetaDataSync();
-        var numColumns = rsmd.getColumnCountSync();
-        var columnNames = new Array(numColumns);
-        var columnTypes = new Array(numColumns);
-        var arrayObjects = [];
-        for (var i = 0; i < columnNames.length; i++) {
+        let sqlTypes = java.import('java.sql.Types');
+        let rsmd = this.rs.getMetaDataSync();
+        let numColumns = rsmd.getColumnCountSync();
+        let columnNames = new Array(numColumns);
+        let columnTypes = new Array(numColumns);
+        let arrayObjects = [];
+        for (let i = 0; i < columnNames.length; i++) {
             columnNames[i] = rsmd.getColumnLabelSync(i + 1);
             columnTypes[i] = rsmd.getColumnTypeSync(i + 1);
         }
         this.rs.setFetchSizeSync(numRows);
         while (this.rs.nextSync()) {
-            var obj = {};
-            for (var i = 0; i < numColumns; i++) {
+            let obj = {};
+            for (let i = 0; i < numColumns; i++) {
                 switch (columnTypes[i]) {
                     case sqlTypes.ARRAY:
                         obj[columnNames[i]] = this.rs.getArraySync(columnNames[i]);
@@ -72,7 +72,7 @@ class JDBCResultSet {
             arrayObjects.push(obj);
         }
         _.each(arrayObjects, o => _.each(o, (v, k) => {
-            var value = _.trim(v);
+            let value = _.trim(v);
             o[k] = appUtil.infereType(value);
         }));
         return arrayObjects;

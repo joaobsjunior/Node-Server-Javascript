@@ -5,7 +5,7 @@ const mensagemEnum = require('./enum/message.enum');
 const base64url = require('base64url');
 const jws = require('jws');
 const _ = require('lodash');
-var CryptoJS = require("crypto-js");
+let CryptoJS = require("crypto-js");
 const AppUtil = require('./app-util');
 const projectEnum = require('./enum/project.enum');
 
@@ -14,10 +14,10 @@ let ResponseData = require('./response-data');
 
 
 exports = module.exports = () => {
-    var checkAutorizationAccess = (username, groups, res, callback) => {
-        var query = '(&(objectClass=user)(sAMAccountName=' + username + '))';
+    let checkAutorizationAccess = (username, groups, res, callback) => {
+        let query = '(&(objectClass=user)(sAMAccountName=' + username + '))';
         global.AD.find(query, function (err, results) {
-            var callbackLocal = (resp) => {
+            let callbackLocal = (resp) => {
                 callback(false, resp);
             }
             if ((err) || (!results)) {
@@ -28,7 +28,7 @@ exports = module.exports = () => {
                 ResponseData.errorResponse(err, callbackLocal);
                 return;
             }
-            var query = '(&(member=' + results.users[0].dn + '))';
+            let query = '(&(member=' + results.users[0].dn + '))';
             global.AD.find(query, function (err, results) {
                 if ((err) || (!results)) {
                     if (!err) {
@@ -42,69 +42,57 @@ exports = module.exports = () => {
                     ResponseData.errorResponse(err, callbackLocal);
                     return;
                 }
-                var groupsOfUser = results.groups.map((value) => {
+                let groupsOfUser = results.groups.map((value) => {
                     return _.camelCase(value.cn);
                 });
-                var find = _.find(groupsOfUser, (o) => {
+                let find = _.find(groupsOfUser, (o) => {
                     return groups.indexOf(o) != -1;
                 });
                 if (find) {
                     callback(true, null);
                 } else {
-                    var msg = mensagemEnum.msg06;
+                    let msg = mensagemEnum.msg06;
                     log.info(msg);
                     if (res) {
                         res.status(401);
                     }
-                    var error = new Error();
+                    let error = new Error();
                     error.message = msg;
                     ResponseData.errorResponse(error, callbackLocal);
                 }
             });
         });
     }
-    var checkAuth = (username, password, res, groups, callback) => {
-        global.AD.authenticate(username + '@domain.local', password, (err, auth) => {
-            var callbackLocal = (resp) => {
-                callback(false, resp);
-            }
-            if (err) {
-                log.error(err);
-            }
-            if (auth) {
-                if (groups.length) {
-                    checkAutorizationAccess(username, groups, res, callback);
-                } else {
-                    callback(true);
-                }
-            } else {
-                var msg = mensagemEnum.server403;
-                log.info(msg);
-                if (res) {
-                    res.status(403);
-                }
-                var error = new Error();
-                error.message = msg;
-                ResponseData.errorResponse(error, callbackLocal);
-            }
-        });
+    let checkAuth = (username, password, res, groups, callback) => {
+        callback(true, null);
     };
     return {
         authenticate: (req, res, next) => {
             res.socket.setTimeout(7200000);
-            var isMobile = AppUtil.isMobile(req.headers['user-agent']);
-            var device = isMobile ? 'mobile' : 'desktop';
-            var projectName = _.filter(projectEnum, function (o) {
+            let isMobile = AppUtil.isMobile(req.headers['user-agent']);
+            let device = isMobile ? 'mobile' : 'desktop';
+            let projectName = _.filter(projectEnum, function (o) {
                 return o.id == req.headers.project;
             });
             projectName = projectName[0] || {};
-            log.info("[RESQUEST] - URL: ["+req.method.toUpperCase()+"] '" + req.originalUrl + "' | USER: '" + ((req.headers.username) ? req.headers.username : '##') + "' | PROJECT: '" + projectName.name + "' | DEVICE: '" + device + "'");
-            var path = req.route.path;
-            var groups = [];
-            var groupADArray = [];
-            var swagger = global.swaggerSpec;
-            var swaggerParams = swagger.paths[path][req.method.toLowerCase()];
-            var requireAD = groupADArray = swaggerParams['requireAD'];
+            let user = req.headers.username || req.body.username || '##';
+            let params = AppUtil.clone(req.body) || {};
+            if (params.password) {
+                params.password = "***";
+            }
+            params = JSON.stringify(params, null, 4);
+            let method = req.method.toUpperCase();
+            let logStr = "[RESQUEST] - URL: [" + method + "] '" + req.originalUrl + "' | USER: '" + user + "' | PROJECT: '" + projectName.name + "' | DEVICE: '" + device + "'";
+            if (method != 'GET') {
+                logStr += " BODY: '\n" + params + "'";
+            }
+            log.info(logStr);
+            let path = req.route.path;
+            let groups = [];
+            let groupADArray = [];
+            let swagger = global.swaggerSpec;
+            let swaggerParams = swagger.paths[path][req.method.toLowerCase()];
+            let requireAD = groupADArray = swaggerParams['requireAD'];
             if (swaggerParams['onlyLocalhost'] && req.headers.host.toLowerCase().indexOf('localhost') != 0) {
                 res.status(500);
                 ResponseData.errorResponse(new Error(), (data) => {
@@ -132,7 +120,7 @@ exports = module.exports = () => {
                 });
                 return;
             }
-            if (!req.headers.username && !req.headers.token) {
+            if (!req.headers.token) {
                 res.status(500);
                 ResponseData.errorResponse(new Error(), (data) => {
                     res.send(data);
@@ -140,8 +128,10 @@ exports = module.exports = () => {
                 });
                 return;
             }
-            var username = req.headers.username;
-            var password = CryptoJS.AES.decrypt(String(req.headers.token), global.config.keyRequestAutentication).toString(CryptoJS.enc.Utf8);
+            let userdata = CryptoJS.AES.decrypt(String(req.headers.token), global.config.keyRequestAutentication).toString(CryptoJS.enc.Utf8);
+            userdata = JSON.parse(userdata);
+            let username = userdata.username;
+            let password = userdata.password;
             checkAuth(username, password, res, groups, (auth, message) => {
                 if (auth) {
                     next();

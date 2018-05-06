@@ -1,8 +1,8 @@
 'use strict';
 
-var config = require('../config/config')();
-var logConfig = config.log;
-var logStreams = [];
+let config = require('../config/config')();
+let logConfig = config.log;
+let logStreams = [];
 
 
 var
@@ -10,7 +10,7 @@ var
 	;
 
 function setDependencies() {
-	var bunyan = require('bunyan');
+	let bunyan = require('bunyan');
 
 	function DevelopmentRawStream() { }
 
@@ -22,13 +22,13 @@ function setDependencies() {
 	};
 
 
-	var consoleLog = {
+	let consoleLog = {
 		level: logConfig.level,
 		stream: new DevelopmentRawStream(),
 		type: 'raw'
 	};
 
-	var fileLog = {
+	let fileLog = {
 		level: logConfig.level,
 		path: logConfig.file.path
 	};
@@ -73,12 +73,12 @@ function log(strMessage, strType) {
 
 function generateLogInterface(strLogType) {
 	return function () {
-		var args = utils.getArrayFromArguments(arguments);
+		let args = utils.getArrayFromArguments(arguments);
 		log(args, strLogType);
 	};
 }
 
-var logInterface = {
+let logInterface = {
 	info: generateLogInterface('info'),
 	warn: generateLogInterface('warn'),
 	error: generateLogInterface('error')

@@ -3,7 +3,7 @@
 const nodemailer = require('nodemailer');
 
 class Mailer {
-    static send(callback, assunto, mensagem, isHtml = false, para = null, de = null) {
+    static send(callback, assunto, mensagem, isHtml = false, para = null, attachments = null) {
         if (!config.server.mail.sendEmail) {
             log.warn('mailer', 'Envio de email desabilitado nas configurações: verifique config.js');
         }
@@ -23,22 +23,25 @@ class Mailer {
 
         // setup email data with unicode symbols
         let mailOptions = {
-            from: de || config.server.mail.overrideFrom,
+            from: config.server.mail.overrideFrom,
             bcc: para || config.server.mail.overrideTo,
             replyTo: config.server.mail.overrideTo,
             subject: config.server.mail.subjectPrefix + assunto,
         };
-        if (isHtml)
+        if (isHtml) {
             mailOptions.html = mensagem;
-        else
+        } else {
             mailOptions.text = mensagem;
-
+        }
+        if (attachments) {
+            mailOptions.attachments = attachments;
+        }
         //
         // debug('mailOptions', mailOptions);
 
         // send mail with defined transport object
         transporter.sendMail(mailOptions, (error, info) => {
-            var isSuccess = null;
+            let isSuccess = null;
             if (error) {
                 isSuccess = false;
                 log.error(error);

@@ -4,6 +4,7 @@ const ResponseData = require('./response-data');
 let Mensagem = require('./model/Message.model');
 const moment = require('moment');
 const _array = require('lodash-compat/array');
+let _ = require('lodash');
 
 String.prototype.lpad = function (padString, length) {
     var str = this;
@@ -99,6 +100,27 @@ class AppUtil {
         }
     }
 
+    static objToUpperCase(obj, ANNOTATION, isPROCEDURE = false) {
+        var bindVars = JSON.parse(JSON.stringify(obj));
+        var object = obj.getAnnotations(ANNOTATION, 10);
+        _.forEach(object, (value, key) => {
+            var valueObj = eval("bindVars." + key);
+            if (typeof valueObj == 'string') {
+                eval("bindVars." + key + " = bindVars." + key + ".toUpperCase()");
+            }
+            if (isPROCEDURE) {
+                if (valueObj === null) {
+                    eval("bindVars." + key + " = 'null'");
+                }
+                if (value.type == 'date' && valueObj) {
+                    valueObj = valueObj.split('T')[0];
+                    eval("bindVars." + key + " = '" + valueObj + "'");
+                }
+            }
+        });
+        return bindVars;
+    }
+
     static getTime(hours, minutes) {
         if (this.isInvalidNumber(hours) || this.isInvalidNumber(minutes)) {
             return null;
@@ -107,7 +129,25 @@ class AppUtil {
         return dataEspecifica;
     }
 
+    static validateEmail(email) {
+        return (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/).test(email);
+    }
+
+    static currency(value) {
+        return parseFloat(value).toLocaleString('en-US', {
+            minimumFractionDigits: 2,
+            style: 'currency',
+            currency: 'USA'
+        }).replace(/\./, '@').replace(/\,/gi, '.').replace('USA', 'R$ ').replace(/\@/, ',');
+    }
+
+    static clone(object) {
+        return JSON.parse(JSON.stringify(object));
+    }
+
     static validateCPF(cpf) {
+        cpf = cpf.toString();
+        cpf = AppUtil.fill(cpf, 11);
         cpf = cpf.replace(/\D/g, "");
         var numeros, digitos, soma, i, resultado, digitos_iguais;
         digitos_iguais = 1;
@@ -141,6 +181,8 @@ class AppUtil {
 
     static validateCNPJ(cnpj) {
         var numeros, digitos, tamanho, soma, pos, i, resultado, digitos_iguais;
+        cnpj = cnpj.toString();
+        cnpj = AppUtil.fill(cnpj, 14);
         cnpj = cnpj.replace(/\D/g, "");
         cnpj = cnpj.replace(/[^\d]+/g, '');
 
@@ -194,6 +236,10 @@ class AppUtil {
 
     }
 
+    static dateStringToLocale(dateString) {
+        return dateString.split('-').reverse().join('/');
+    }
+
     static arrayToString(value) {
         let newValue = JSON.stringify(value);
         newValue = newValue.replace(/\[/g, '').replace(/\]/g, '').replace(/\,/g, ';').replace(/\"/g, '').replace(/\&/g, ',');
@@ -205,6 +251,27 @@ class AppUtil {
             return value.toISOString().split('T')[0];
         }
         return new String();
+    }
+
+    static date2String(dateObj = new Date()) {
+        let month = AppUtil.fill(dateObj.getMonth() + 1, 2);
+        let year = dateObj.getFullYear().toString();
+        let date = AppUtil.fill(dateObj.getDate(), 2);
+        let dateStr = new Array(year, month, date).join('-');
+        return dateStr;
+    }
+
+    static string2Date(dateStr) {
+        let dateObj = new Date();
+        let dateArr = dateStr.split('-');
+        dateObj.setDate(dateArr[2]);
+        dateObj.setMonth(dateArr[1] - 1);
+        dateObj.setFullYear(dateArr[0]);
+        dateObj.setHours(0);
+        dateObj.setMinutes(0);
+        dateObj.setSeconds(0);
+        dateObj.setMilliseconds(0);
+        return dateObj;
     }
 
     static dateClearTimer(value = new Date()) {
@@ -241,7 +308,37 @@ class AppUtil {
         });
     }
 
+    static removeKeysExcept(object, keysExcept = [], isFirstLevel = true) {
+        let arrayKeysExcept = [],
+            arrayNextKeysExcept = {};
+        _.forEach(keysExcept, (value, i) => {
+            let j = value.split('.');
+            let keyExcept = j[0];
+            arrayKeysExcept.push(keyExcept);
+            j.shift();
+            if (j.length) {
+                j = j.join('.');
+                if (!arrayNextKeysExcept[keyExcept]) {
+                    arrayNextKeysExcept[keyExcept] = [];
+                }
+                arrayNextKeysExcept[keyExcept].push(j);
+            }
+        })
+        _.forEach(arrayNextKeysExcept, (value, key) => {
+            AppUtil.removeKeysExcept(object[key], value, false);
+        });
+        if (isFirstLevel) {
+            return;
+        }
+        Object.keys(object).forEach(function (key) {
+            if (arrayKeysExcept.indexOf(key) == -1) {
+                delete object[key];
+            }
+        });
+    }
+
     static fill(n, width, z) {
+        width = width || 2;
         z = z || '0';
         n = n.toString();
         return n.length >= width ? n : new Array(width - n.length + 1).join(z) + n;
@@ -305,6 +402,63 @@ class AppUtil {
             return false;
         }
         return true;
+    }
+
+    static csvToJSON(csv, strDelimiter) {
+        strDelimiter = (strDelimiter || ",");
+        var CSVToArray = function (strData, strDelimiter) {
+            var objPattern = new RegExp((
+                "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
+                "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+                "([^\"\\" + strDelimiter + "\\r\\n]*))"), "gi");
+            var arrData = [
+                []
+            ];
+            var arrMatches = null;
+            while (arrMatches = objPattern.exec(strData)) {
+                var strMatchedDelimiter = arrMatches[1];
+                if (strMatchedDelimiter.length && (strMatchedDelimiter != strDelimiter)) {
+                    arrData.push([]);
+                }
+                if (arrMatches[2]) {
+                    var strMatchedValue = arrMatches[2].replace(
+                        new RegExp("\"\"", "g"), "\"");
+                } else {
+                    var strMatchedValue = arrMatches[3].trim();
+                }
+                arrData[arrData.length - 1].push(strMatchedValue);
+            }
+            return (arrData);
+        }
+
+
+        var array = CSVToArray(csv, strDelimiter);
+        var objArray = [];
+        for (var i = 1; i < array.length; i++) {
+            objArray[i - 1] = {};
+            for (var k = 0; k < array[0].length && k < array[i].length; k++) {
+                var key = array[0][k];
+                objArray[i - 1][key] = array[i][k]
+            }
+        }
+
+        var json = JSON.stringify(objArray);
+        var str = json.replace(/},/g, "},\r\n");
+
+        return JSON.parse(str);
+    }
+
+    static query2Body(query = {}) {
+        let data_context = {};
+        _.forEach(query, function (value, key) {
+            try {
+                data_context[key] = JSON.parse(value);
+            } catch (error) {
+                var int = parseFloat(value);
+                data_context[key] = (int.toString() != value) ? value : int;
+            }
+        });
+        return data_context;
     }
 
 }

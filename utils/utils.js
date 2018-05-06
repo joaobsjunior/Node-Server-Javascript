@@ -2,7 +2,7 @@
 
 function Utils () {
 
-	var me = this;
+	let me = this;
 
 	/**
 	 * copyObj - Clones a object, without memory reference

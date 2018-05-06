@@ -1,75 +1,65 @@
-'use strict';
+"use strict";
 
-var config = {
+let config = {
     app: {
-        name: 'Node-Server',
+        name: "Node Server - API",
         // Loaded after the app boot
-        actualName: ''
+        actualName: ""
     },
     routes: {},
     // Loaded after the app boot
     loadedRoutes: [],
-    encoding: 'utf8',
+    encoding: "utf8",
     ldap: {
-        url: 'ldap://10.200.1.10:389',
-        baseDN: 'dc=domain,dc=local',
-        username: 'user@domain.local',
-        password: 'password'
+        url: "ldap://0.0.0.0:389",
+        baseDN: "dc=domain,dc=local",
+        username: "user@domain.com",
+        password: "password"
     },
-    keyRequestAutentication: '<PASSWORD>',
+    keyRequestAutentication: "password",
     server: {
         port: 9090,
         // Loaded after the app boot
-        actualPort: '',
+        actualPort: "",
         disableInterceptor: true,
         debugPosts: true,
         maxRows: 1000,
         mail: {
-            service: 'smtp',
-            host: '<HOST>',
+            service: "smtp",
+            host: "smtp@domain.com.br",
             port: 587,
             auth: {
-                user: '<USER>',
-                pass: '<PASSWORD>'
+                user: "username",
+                pass: "password"
             },
-            subjectPrefix: 'Node-Server | ',
+            subjectPrefix: "Node Server | ",
             sendEmail: true, // para desabilitar envio de email: false.
-            overrideFrom: 'no-reply@domain.com.br',
-            overrideTo: 'contact@domain.com.br'
+            overrideFrom: "no-reply@domain.com.br",
+            overrideTo: "contact@domain.com.br"
         }
     },
     paths: {
-        root: '.',
-        app: 'app',
-        config: 'config',
-        common: 'common'
+        root: ".",
+        app: "app",
+        config: "config",
+        common: "common",
+        voucher: "/opt/voucher",
+        voucherBank: "/opt/voucher/bank"
     },
     log: {
         // info, warn, error
-        level: 'info',
+        level: "info",
         // file, console, all
-        type: 'all',
+        type: "all",
         file: {
-            path: './output-server.log'
+            path: "./output-server.log"
         }
     },
     resources: {
-        defaultVersion: 'v1'
+        defaultVersion: "v1"
     },
-    mail: {
-
-    },
-    urls: {
-        // soa: {
-        //     protocol: 'http',
-        //     env: 'MISP',
-        //     url: '10.6.11.159',
-        //     port: 7101
-        // }
-    }
 };
 
 module.exports = function () {
     return config;
 };
-

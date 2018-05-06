@@ -3,6 +3,7 @@
 // Example: $ FORCE_COLOR=1 npm start /path/to/your/script.js
 const chalk = require('chalk');
 require('annotation-js');
+let Route = require('./route/Route');
 global.annotationsDebug = false;
 
 console.log(chalk.blue.bold('#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-#'));
@@ -13,7 +14,7 @@ console.log('#####################');
 console.log('Protocolo: REST');
 console.log('Formato  : JSON');
 console.log('Versao   : 1.0');
-console.log('Empresa Responsável: Node Server Online');
+console.log('Empresa Responsável: Node Server');
 console.log(chalk.blue.bold('----------------------------------------------------------------------------------'));
 console.log(chalk.white.bgGreen.bold('Inicializando Gateway'));
 console.log('Inicializando variaveis...');
@@ -69,7 +70,7 @@ var
 	token,
 	httpOptions;
 
-var os = require('os');
+let os = require('os');
 const jws = require('jws');
 const mail = require('./common/mailer');
 
@@ -85,18 +86,18 @@ function setDependencies() {
 	express = require('express');
 	helmet = require('helmet')
 	bodyParser = require('body-parser');
-    //ActiveDirectory = require('activedirectory');
+	ActiveDirectory = require('activedirectory');
 
 	global.mail = mail;
 	global.path = path;
 
 	// Setting configurations
 	config.paths.root = path.resolve(__dirname);
-	config.paths.app = path.resolve(__dirname) + '/app/resources';
+	config.paths.app = path.resolve(__dirname) + '/app/resources/sales';
 	global.config = config;
 
 	//LDAP
-	//global.AD = new ActiveDirectory(global.config.ldap);
+	global.AD = new ActiveDirectory(global.config.ldap);
 
 	global.interceptor = interceptor;
 
@@ -128,28 +129,26 @@ function configServer() {
 	});
 
 	app.use(bodyParser.urlencoded({
+		limit: '50mb',
 		extended: false
 	}));
 
-	app.use(bodyParser.json());
+	app.use(bodyParser.json({ limit: '50mb' }));
 
 	app.use(express.static(path.join(__dirname, 'public')));
-
-	let BasePath = path.resolve(__dirname, './app/resources');
 
 	let httpOptions = require('./common/http-options')();
 	httpOptions.localParam.version = 'api';
 	httpOptions.localParam.pathBase = '';
-	httpOptions.gatewayParam.hostName = 'localhost';
+	httpOptions.gatewayParam.hostName = '10.200.1.190';
 	httpOptions.gatewayParam.port = 7101;
 	httpOptions.gatewayParam.pathBase = '/servico/rest';
 
 	let Factory = new require('./common/resource-factory')(app, httpOptions);
 
-	/*ENTRY POINTS*/
-	
-	Factory.create(path.resolve(__dirname, './app/resources/login/Login.service.js'));
-
+	/*----------------- ENTRY POINTS -----------------*/
+	// DOMAIN
+	let route = new Route(Factory);
 
 }
 
@@ -159,37 +158,37 @@ function configServer() {
  */
 function startServer() {
 
-	var interfaces = os.networkInterfaces();
-	var addresses = [];
-	for (var k in interfaces) {
-		for (var k2 in interfaces[k]) {
-			var address = interfaces[k][k2];
+	let interfaces = os.networkInterfaces();
+	let addresses = [];
+	for (let k in interfaces) {
+		for (let k2 in interfaces[k]) {
+			let address = interfaces[k][k2];
 			if (address.family === 'IPv4' && !address.internal) {
 				addresses.push(address.address);
 			}
 		}
 	}
 
-	var serverIP = addresses[0];
+	let serverIP = addresses[0];
 
-	var swaggerJSDoc = require('swagger-jsdoc');
+	let swaggerJSDoc = require('swagger-jsdoc');
 
 	// swagger definition
-	var swaggerDefinition = {
+	let swaggerDefinition = {
 		info: {
-			title: 'domain - APIs',
+			title: 'Node Server - APIs',
 			version: '1.0.0',
-			description: 'Lista de APIs de integração do Node Server.',
+			description: 'Lista de APIs de integração do Node Server',
 		},
 		host: serverIP + ':' + config.server.port,
 		basePath: '/',
 	};
 
-	var options = {
+	let options = {
 		swaggerDefinition: swaggerDefinition,
 		apis: [
 			/*DOCUMENTATION*/
-			'./app/resources/login/*.js',
+			//'./app/resources/login/*.js',
 		],
 	};
 
@@ -197,7 +196,7 @@ function startServer() {
 	console.log("host local: http://localhost:" + config.server.port + "/api-docs/");
 
 	// initialize swagger-jsdoc
-	var swaggerSpec = swaggerJSDoc(options);
+	let swaggerSpec = swaggerJSDoc(options);
 	global.swaggerSpec = swaggerSpec;
 
 	/*app.get('/swagger.json', function (req, res) {
@@ -218,5 +217,17 @@ function init() {
 	// readRoutes ();
 	startServer();
 }
+
+(function () {
+	var childProcess = require("child_process");
+	var oldSpawn = childProcess.spawn;
+	function mySpawn() {
+		console.log('spawn called');
+		console.log(arguments);
+		var result = oldSpawn.apply(this, arguments);
+		return result;
+	}
+	childProcess.spawn = mySpawn;
+})();
 
 init();

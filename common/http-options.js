@@ -40,9 +40,9 @@ function httpOptions () {
         let reg = new Registro();
         if (Object.keys(req.query).length != 0) {
 
-            for (var propName in req.query) {
+            for (let propName in req.query) {
                 if (req.query.hasOwnProperty(propName)) {
-                    for(var key in obj){
+                    for(let key in obj){
                         if(key == propName && key != 'dataParam') {
                             if(!isNaN(req.query[propName])) { obj[key] = parseInt(req.query[propName]); }
                             else { obj[key] = req.query[propName]; };
@@ -62,8 +62,8 @@ function httpOptions () {
         if(config.server.debugPosts == true) {
             return JSON.parse(req.query.dataParam);
         } else {
-            var bytes  = CryptoJS.AES.decrypt(req.query.dataParam, 'teste');
-            var decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+            let bytes  = CryptoJS.AES.decrypt(req.query.dataParam, 'teste');
+            let decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
             return decryptedData;
         }
     };

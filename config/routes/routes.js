@@ -1,6 +1,6 @@
 'use strict';
 
-var routes = [];
+let routes = [];
 
 // Padrão para criação de rotas
 // {

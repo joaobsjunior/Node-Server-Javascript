@@ -13,7 +13,7 @@ class Message {
 
     setMessage(msgEnum, value) {
         if (msgEnum && value) {
-            var compiler = _.template(msgEnum);
+            let compiler = _.template(msgEnum);
             this.message = compiler({
                 value: value
             });

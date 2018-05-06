@@ -10,8 +10,8 @@ module.exports = {
       server: null
     },
     config: {
-      url: 'jdbc:mariadb://<HOST>:<PORT>/<DBNAME>?user=<USER>&password=<PASSWORD>',
-      drivername: 'org.mariadb.jdbc.Driver'
+      url: 'jdbc:mysql://0.0.0.0:3306/sales?user=user&password=password',
+      drivername: 'com.mysql.jdbc.Driver'
     }
-  }
+  },
 };
