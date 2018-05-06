@@ -14,55 +14,6 @@ let ResponseData = require('./response-data');
 
 
 exports = module.exports = () => {
-    let checkAutorizationAccess = (username, groups, res, callback) => {
-        let query = '(&(objectClass=user)(sAMAccountName=' + username + '))';
-        global.AD.find(query, function (err, results) {
-            let callbackLocal = (resp) => {
-                callback(false, resp);
-            }
-            if ((err) || (!results)) {
-                log.error(err);
-                if (res) {
-                    res.status(403);
-                }
-                ResponseData.errorResponse(err, callbackLocal);
-                return;
-            }
-            let query = '(&(member=' + results.users[0].dn + '))';
-            global.AD.find(query, function (err, results) {
-                if ((err) || (!results)) {
-                    if (!err) {
-                        err = new Error();
-                        err.message = mensagemEnum.msg06;
-                    }
-                    log.error(err);
-                    if (res) {
-                        res.status(401);
-                    }
-                    ResponseData.errorResponse(err, callbackLocal);
-                    return;
-                }
-                let groupsOfUser = results.groups.map((value) => {
-                    return _.camelCase(value.cn);
-                });
-                let find = _.find(groupsOfUser, (o) => {
-                    return groups.indexOf(o) != -1;
-                });
-                if (find) {
-                    callback(true, null);
-                } else {
-                    let msg = mensagemEnum.msg06;
-                    log.info(msg);
-                    if (res) {
-                        res.status(401);
-                    }
-                    let error = new Error();
-                    error.message = msg;
-                    ResponseData.errorResponse(error, callbackLocal);
-                }
-            });
-        });
-    }
     let checkAuth = (username, password, res, groups, callback) => {
         callback(true, null);
     };

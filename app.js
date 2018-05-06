@@ -37,8 +37,6 @@ var
 	express,
 	// Generic Configurations  ( server, paths )
 	config,
-	//LDAP
-	ActiveDirectory,
 	// Generic tools
 	utils,
 	// Component to control log
@@ -86,7 +84,6 @@ function setDependencies() {
 	express = require('express');
 	helmet = require('helmet')
 	bodyParser = require('body-parser');
-	ActiveDirectory = require('activedirectory');
 
 	global.mail = mail;
 	global.path = path;
@@ -95,9 +92,6 @@ function setDependencies() {
 	config.paths.root = path.resolve(__dirname);
 	config.paths.app = path.resolve(__dirname) + '/app/resources/sales';
 	global.config = config;
-
-	//LDAP
-	global.AD = new ActiveDirectory(global.config.ldap);
 
 	global.interceptor = interceptor;
 
