@@ -141,8 +141,7 @@ function configServer() {
 	let Factory = new require('./common/resource-factory')(app, httpOptions);
 
 	/*----------------- ENTRY POINTS -----------------*/
-	// DOMAIN
-	let route = new Route(Factory);
+	let route = Route.factory(Factory);
 
 }
 
@@ -180,10 +179,7 @@ function startServer() {
 
 	let options = {
 		swaggerDefinition: swaggerDefinition,
-		apis: [
-			/*DOCUMENTATION*/
-			//'./app/resources/login/*.js',
-		],
+		apis: Route.documentation(),
 	};
 
 	console.log("host externo: http://" + serverIP + ":" + config.server.port + "/api-docs/");

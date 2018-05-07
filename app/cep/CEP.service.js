@@ -1,19 +1,13 @@
 'use strict';
+const routeCreator = require('../../common/route-creator')();
 
-// constants
-const routeCreator = require('../../../common/route-creator')();
-// model domains
-let AppUtil = require('../../../common/app-util');
-let Response = require('../../../common/model/Response.model');
-let ResponseData = require('../../../common/response-data');
-const messageEnum = require('../../../common/enum/message.enum');
+let AppUtil = require('../../common/app-util');
+let Response = require('../../common/model/Response.model');
+let ResponseData = require('../../common/response-data');
+const messageEnum = require('../../common/enum/message.enum');
 let _ = require('lodash');
 let request = require('request');
-
-//controller
-
-// const
-const CONTEXT_SITUACAO_POLITICA_TARIFARIA = 'CEP';
+let fs = require('fs');
 
 class CEPService {
 
@@ -76,24 +70,17 @@ class CEPService {
 
 		/*----------------------------- ROUTES -----------------------------*/
 
-
-
 		/**
 		 * @swagger
 		 * /api/cep/:zipCode:
 		 *   get:
-		 *     tags:
-		 *       - domain_service
-		 *     summary:
-		 *     description: 
-		 *     parameters:
+		 *     description:
 		 *     produces:
 		 *       - application/json
+		 *     parameters:
 		 *     responses:
 		 *       200:
-		 *         description:
-		 *         schema:
-		 *           $ref: '#/definitions/CEP'
+		 *         description: login
 		 */
 		routeCreator.bind(this._context, this._options.verbEnum.GET, servicePath, this._getAddress);
 
