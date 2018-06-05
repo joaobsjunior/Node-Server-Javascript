@@ -209,8 +209,8 @@ exports = module.exports = () => {
                                     } else {
                                         let compiled = _.template(SQL);
                                         SQL = compiled(bindVars);
-                                        let Connection = java.import('java.sql.Connection');
-                                        conn._conn.setTransactionIsolationSync(Connection.TRANSACTION_READ_UNCOMMITTED);
+                                        //let Connection = java.import('java.sql.Connection');
+                                        //conn._conn.setTransactionIsolationSync(Connection.TRANSACTION_READ_UNCOMMITTED);}
                                         statement.setFetchSize(numRows, (err) => {
                                             if (err) {
                                                 respData.errorResponse(err, callbackBefore);

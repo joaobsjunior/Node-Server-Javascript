@@ -3,18 +3,17 @@
 // Example: $ FORCE_COLOR=1 npm start /path/to/your/script.js
 const chalk = require('chalk');
 require('annotation-js');
-let Route = require('./route/Route');
 global.annotationsDebug = false;
 
 console.log(chalk.blue.bold('#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-#'));
-console.log(chalk.blue.bold(' Node Server'));
+console.log(chalk.blue.bold(' Node-Server'));
 console.log(chalk.blue.bold('#-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-#'));
 console.log('Informaçcoes Tecnicas');
 console.log('#####################');
 console.log('Protocolo: REST');
 console.log('Formato  : JSON');
 console.log('Versao   : 1.0');
-console.log('Empresa Responsável: Node Server');
+console.log('Empresa Responsável: Node-Server Online');
 console.log(chalk.blue.bold('----------------------------------------------------------------------------------'));
 console.log(chalk.white.bgGreen.bold('Inicializando Gateway'));
 console.log('Inicializando variaveis...');
@@ -37,6 +36,8 @@ var
 	express,
 	// Generic Configurations  ( server, paths )
 	config,
+	//LDAP
+	ActiveDirectory,
 	// Generic tools
 	utils,
 	// Component to control log
@@ -84,6 +85,7 @@ function setDependencies() {
 	express = require('express');
 	helmet = require('helmet')
 	bodyParser = require('body-parser');
+	ActiveDirectory = require('activedirectory');
 
 	global.mail = mail;
 	global.path = path;
@@ -92,6 +94,9 @@ function setDependencies() {
 	config.paths.root = path.resolve(__dirname);
 	config.paths.app = path.resolve(__dirname) + '/app/resources/sales';
 	global.config = config;
+
+	//LDAP
+	global.AD = new ActiveDirectory(global.config.ldap);
 
 	global.interceptor = interceptor;
 
@@ -127,9 +132,13 @@ function configServer() {
 		extended: false
 	}));
 
-	app.use(bodyParser.json({ limit: '50mb' }));
+	app.use(bodyParser.json({
+		limit: '50mb'
+	}));
 
 	app.use(express.static(path.join(__dirname, 'public')));
+
+	let BasePath = path.resolve(__dirname, './app/resources');
 
 	let httpOptions = require('./common/http-options')();
 	httpOptions.localParam.version = 'api';
@@ -141,8 +150,10 @@ function configServer() {
 	let Factory = new require('./common/resource-factory')(app, httpOptions);
 
 	/*----------------- ENTRY POINTS -----------------*/
-	let route = Route.factory(Factory);
-
+	// DOMAIN
+	Factory.create(BasePath + '/login/Login.service.js');
+	Factory.create(BasePath + '/cep/CEP.service.js');
+	
 }
 
 
@@ -169,9 +180,9 @@ function startServer() {
 	// swagger definition
 	let swaggerDefinition = {
 		info: {
-			title: 'Node Server - APIs',
+			title: 'NodeServer - APIs',
 			version: '1.0.0',
-			description: 'Lista de APIs de integração do Node Server',
+			description: 'Lista de APIs de integração do Node-Server.',
 		},
 		host: serverIP + ':' + config.server.port,
 		basePath: '/',
@@ -179,7 +190,12 @@ function startServer() {
 
 	let options = {
 		swaggerDefinition: swaggerDefinition,
-		apis: Route.documentation(),
+		apis: [
+			/*DOCUMENTATION*/
+			// DOMAIN
+			'./app/resources/login/*.js',
+			'./app/resources/cep/*.js',
+		],
 	};
 
 	console.log("host externo: http://" + serverIP + ":" + config.server.port + "/api-docs/");
@@ -211,6 +227,7 @@ function init() {
 (function () {
 	var childProcess = require("child_process");
 	var oldSpawn = childProcess.spawn;
+
 	function mySpawn() {
 		console.log('spawn called');
 		console.log(arguments);

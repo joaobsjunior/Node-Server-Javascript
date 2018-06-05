@@ -22,7 +22,7 @@ npm i -g pm2
 - Execute o servidor com PM2
 ```
 #!shell-script
-pm2 start app.js --watch -i 1
+pm2 start gateway-server.js --watch -i 1
 ```
 
 Ou diretamente com nodejs:

@@ -325,7 +325,9 @@ class AppUtil {
             }
         })
         _.forEach(arrayNextKeysExcept, (value, key) => {
-            AppUtil.removeKeysExcept(object[key], value, false);
+            if(object[key]){
+                AppUtil.removeKeysExcept(object[key], value, false);
+            }
         });
         if (isFirstLevel) {
             return;
