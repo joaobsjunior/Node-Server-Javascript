@@ -2,7 +2,7 @@
 
 let config = {
     app: {
-        name: "Node-API",
+        name: "Node Server - API",
         // Loaded after the app boot
         actualName: ""
     },
@@ -11,9 +11,9 @@ let config = {
     loadedRoutes: [],
     encoding: "utf8",
     ldap: {
-        url: "ldap://localhost:389",
+        url: "ldap://0.0.0.0:389",
         baseDN: "dc=domain,dc=local",
-        username: "user@domain.local",
+        username: "user@domain.com",
         password: "password"
     },
     keyRequestAutentication: "password",
@@ -26,16 +26,16 @@ let config = {
         maxRows: 1000,
         mail: {
             service: "smtp",
-            host: "localhost",
+            host: "smtp@domain.com.br",
             port: 587,
             auth: {
-                user: "gncsys",
+                user: "username",
                 pass: "password"
             },
-            subjectPrefix: "NodeServer | ",
-            sendEmail: true, // to disable email send
-            overrideFrom: "no-reply@domain",
-            overrideTo: "contact@domain"
+            subjectPrefix: "Node Server | ",
+            sendEmail: true, // para desabilitar envio de email: false.
+            overrideFrom: "no-reply@domain.com.br",
+            overrideTo: "contact@domain.com.br"
         }
     },
     paths: {
@@ -57,7 +57,7 @@ let config = {
     },
     resources: {
         defaultVersion: "v1"
-    }
+    },
 };
 
 module.exports = function () {

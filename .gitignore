@@ -5,6 +5,3 @@ output-server.log
 .DS_Store
 lock/
 package-lock.json
-*.xlsx
-*.xls
-*.xlsb
