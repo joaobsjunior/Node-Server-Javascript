@@ -16,7 +16,7 @@ let config = {
         username: "user@domain.com",
         password: "password"
     },
-    keyRequestAutentication: "password",
+    keyRequestAutentication: "@1b%2c^3d&4#$",
     server: {
         port: 9090,
         // Loaded after the app boot

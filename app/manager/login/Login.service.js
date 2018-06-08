@@ -1,17 +1,17 @@
 'use strict';
 
 // constants
-const routeCreator = require('../../common/route-creator')();
-const messageEnum = require('../../common/enum/message.enum');
+const routeCreator = require('../../../common/route-creator')();
+const messageEnum = require('../../../common/enum/message.enum');
 
 // repository patterns
 let LoginRepository = require('./Login.persistence');
 
 // model domains
 let Login = require('./Login.model');
-let AppUtil = require('../../common/app-util');
-let Response = require('../../common/model/Response.model');
-let ResponseData = require('../../common/response-data');
+let AppUtil = require('../../../common/app-util');
+let Response = require('../../../common/model/Response.model');
+let ResponseData = require('../../../common/response-data');
 
 //controller
 let LoginController = require('./Login.controller');
@@ -23,7 +23,7 @@ class LoginService {
 		this._options = JSON.parse(JSON.stringify(httpOptions));
 
 		//INIT REPOSITORY
-		let servicePath = httpOptions.getLocalPathPBase() + '/login';
+		let servicePath = httpOptions.getLocalPathPBase() + '/manager/login';
 		let loginRepository = new LoginRepository();
 
 
@@ -63,12 +63,13 @@ class LoginService {
 
 		/**
 		 * @swagger
-		 * /api/login:
+		 * /api/manager/login:
 		 *   post:
 		 *     tags:
 		 *       - login_service
 		 *     summary: Autenticação
 		 *     requireAD: false
+		 *     onlyLocalhost: false
 		 *     description: Requisição responsável pela autenticação do usuário do domínio Active Directory
 		 *     parameters:
 		 *       - name: objeto

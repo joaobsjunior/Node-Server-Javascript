@@ -5,23 +5,33 @@ const mensagemEnum = require('./enum/message.enum');
 const base64url = require('base64url');
 const jws = require('jws');
 const _ = require('lodash');
-let CryptoJS = require("crypto-js");
 const AppUtil = require('./app-util');
+let LoginRepository = require('../app/manager/login/Login.persistence');
+let Login = require('../app/manager/login/Login.model');
+let CryptoJS = require("crypto-js");
 
 // model domains
 let ResponseData = require('./response-data');
 
 
 exports = module.exports = () => {
-    let checkAuth = (username, password, res, groups, callback) => {
-        callback(true, null);
+    let checkAuth = (email, password, res, groups, callback) => {
+        let login = new Login();
+        login.email = email;
+        login.password = password;
+        let loginRepository = new LoginRepository();
+        loginRepository.checkLogin(login, res, (data) => {
+            if (data.isSuccess && data.size) {
+                callback(true, null);
+            }
+        })
     };
     return {
         authenticate: (req, res, next) => {
             res.socket.setTimeout(7200000);
             let isMobile = AppUtil.isMobile(req.headers['user-agent']);
             let device = isMobile ? 'mobile' : 'desktop';
-            let user = req.headers.username || req.body.username || '##';
+            let user = req.headers.email || req.body.email || '##';
             let params = AppUtil.clone(req.body) || {};
             if (params.password) {
                 params.password = "***";
@@ -51,21 +61,6 @@ exports = module.exports = () => {
                 next();
                 return;
             }
-            try {
-                groupADArray = swagger.paths[path][req.method.toLowerCase()].hasOwnProperty('groupAD');
-                if (groupADArray) {
-                    groups = swagger.paths[path][req.method.toLowerCase()]['groupAD'].map((value) => {
-                        return _.camelCase(value);
-                    });
-                }
-            } catch (err) {
-                res.status(500);
-                ResponseData.errorResponse(err, (data) => {
-                    res.send(data);
-                    res.end();
-                });
-                return;
-            }
             if (!req.headers.token) {
                 res.status(500);
                 ResponseData.errorResponse(new Error(), (data) => {
@@ -76,9 +71,9 @@ exports = module.exports = () => {
             }
             let userdata = CryptoJS.AES.decrypt(String(req.headers.token), global.config.keyRequestAutentication).toString(CryptoJS.enc.Utf8);
             userdata = JSON.parse(userdata);
-            let username = userdata.username;
+            let email = userdata.email;
             let password = userdata.password;
-            checkAuth(username, password, res, groups, (auth, message) => {
+            checkAuth(email, password, res, groups, (auth, message) => {
                 if (auth) {
                     next();
                     return;

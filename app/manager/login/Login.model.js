@@ -17,11 +17,11 @@ class Login {
   constructor() {
     /*
     @Annotation(
-        LOGIN[column="username"],
+        LOGIN[column="email"],
     )
     @type{string}
     */
-    this.username = null;
+    this.email = null;
     /*
     @Annotation(
         LOGIN[column="password"],
