@@ -2,6 +2,7 @@
 
 // constants
 const routeCreator = require('../../common/route-creator')();
+const messageEnum = require('../../common/enum/message.enum');
 
 // repository patterns
 let LoginRepository = require('./Login.persistence');
@@ -11,7 +12,6 @@ let Login = require('./Login.model');
 let AppUtil = require('../../common/app-util');
 let Response = require('../../common/model/Response.model');
 let ResponseData = require('../../common/response-data');
-const messageEnum = require('../../common/enum/message.enum');
 
 //controller
 let LoginController = require('./Login.controller');
@@ -29,11 +29,11 @@ class LoginService {
 
 		//INSERT
 		this._login = (req, res) => {
-			let data_context = req.body;
+			let params = AppUtil.getParams(req, res);
 			let login = new Login();
 
 			try {
-				global.populateToService(login, data_context, "body", "LOGIN", "query", 2);
+				global.populateToService(login, params, "body", "LOGIN", "query", 2);
 
 				let dataController = new LoginController(login, 'login');
 				if (dataController instanceof Response) {
@@ -68,7 +68,7 @@ class LoginService {
 		 *     tags:
 		 *       - login_service
 		 *     summary: Autenticação
-		 *     requireAD: false 
+		 *     requireAD: false
 		 *     description: Requisição responsável pela autenticação do usuário do domínio Active Directory
 		 *     parameters:
 		 *       - name: objeto

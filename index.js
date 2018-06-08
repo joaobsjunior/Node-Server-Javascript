@@ -117,7 +117,7 @@ function configServer() {
 	// Allowing CORS for communication
 	app.use((req, res, next) => {
 		res.header("Access-Control-Allow-Origin", "*");
-		res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, username, token, project");
+		res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, token");
 		res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
 		next();
 	});
@@ -127,9 +127,9 @@ function configServer() {
 		extended: false
 	}));
 
-	app.use(bodyParser.json({ limit: '50mb' }));
-
-	app.use(express.static(path.join(__dirname, 'public')));
+	app.use(bodyParser.json({
+		limit: '50mb'
+	}));
 
 	let httpOptions = require('./common/http-options')();
 	httpOptions.localParam.version = 'api';
@@ -211,6 +211,7 @@ function init() {
 (function () {
 	var childProcess = require("child_process");
 	var oldSpawn = childProcess.spawn;
+
 	function mySpawn() {
 		console.log('spawn called');
 		console.log(arguments);

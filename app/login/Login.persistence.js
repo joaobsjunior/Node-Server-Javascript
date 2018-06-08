@@ -23,14 +23,12 @@ class LoginRepository {
   constructor() {}
 
   loginData(login = new Login(), res, callback) {
-    let username = login.username;
-    let password = login.password;
-    let userData = null;
+    let bindVars = AppUtil.clone(login);
 
     function callGet() {
-      let SQL = fs.readFileSync('sql/query.sql', 'utf8');
+      let SQL = fs.readFileSync('sql/login/login.sql', 'utf8');
       try {
-        dbEngine.execute(dbConfig.DATABASE1, SQL, sqlType.SELECT, bindVars, callbackDB);
+        dbEngine.execute(dbConfig.GSENSEX, SQL, sqlType.SELECT, bindVars, callbackDB);
       } catch (error) {
         AppUtil.errorResponse(error, res, 412, callbackError);
       }
@@ -41,10 +39,10 @@ class LoginRepository {
     //CALLBACK SALE
     function callbackDB(data) {
       if (!data.isSuccess || !data.response) {
-        callbackError(data);
+        callback(data);
         return;
       }
-      callbackSuccess(data);
+      callback(data);
     }
 
     callGet();

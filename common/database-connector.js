@@ -1,6 +1,7 @@
 'use strict';
 const baseEnum = require('../common/enum/database.enum');
 let path = require('path');
+let fs = require('fs');
 
 const util = require('util');
 const appUtil = require('./app-util');
@@ -162,6 +163,10 @@ exports = module.exports = () => {
     };
     return {
         execute: (server, SQL, SQLType, bindVars, callbackResult, $autoCommit = false) => {
+            let serverConnection = {
+                url: (_.template(server.typeserver.url))(server.connection),
+                drivername: server.typeserver.drivername
+            }
             autoCommit = $autoCommit;
             let _connObj, SQL_DB;
             let closeConnection = () => {
@@ -182,17 +187,17 @@ exports = module.exports = () => {
                 respData.successResponse(data, callbackResult);
             };
             let exec = () => {
+                let files = fs.readdirSync(path.resolve(__dirname, './drivers')).filter((value)=>{
+                    return value.lastIndexOf('.jar') != -1;
+                });
+                files = files.map((value) => {
+                    return path.resolve(__dirname, './drivers/' + value);
+                });
                 if (!jinst.isJvmCreated()) {
                     jinst.addOption("-Xrs");
-                    jinst.setupClasspath([
-                        path.resolve(__dirname, './drivers/mysql/mysql-connector-java-5.1.44.jar'),
-                        path.resolve(__dirname, './drivers/informix/ifxjdbc.jar'),
-                        path.resolve(__dirname, './drivers/informix/ifxlang.jar'),
-                        path.resolve(__dirname, './drivers/postgresql/postgresql-9.4.1212.jre7.jar'),
-                        path.resolve(__dirname, './drivers/oracledb/ojdbc8.jar')
-                    ]);
+                    jinst.setupClasspath(files);
                 }
-                SQL_DB = new JDBC(server.config);
+                SQL_DB = new JDBC(serverConnection);
                 SQL_DB.initialize((err) => {
                     if (err) {
                         respData.errorResponse(err, callbackBefore);
@@ -210,7 +215,7 @@ exports = module.exports = () => {
                                         let compiled = _.template(SQL);
                                         SQL = compiled(bindVars);
                                         //let Connection = java.import('java.sql.Connection');
-                                        //conn._conn.setTransactionIsolationSync(Connection.TRANSACTION_READ_UNCOMMITTED);}
+                                        //conn._conn.setTransactionIsolationSync(Connection.TRANSACTION_READ_UNCOMMITTED);
                                         statement.setFetchSize(numRows, (err) => {
                                             if (err) {
                                                 respData.errorResponse(err, callbackBefore);

@@ -1,7 +1,8 @@
 'use strict';
 let path = require('path');
 let entryPoints = [
-    '/cep/CEP.service.js'
+    '/cep/CEP.service.js',
+    '/login/Login.service.js'
 ];
 class Route {
     constructor() {

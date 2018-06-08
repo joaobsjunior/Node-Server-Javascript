@@ -7,7 +7,6 @@ const jws = require('jws');
 const _ = require('lodash');
 let CryptoJS = require("crypto-js");
 const AppUtil = require('./app-util');
-const projectEnum = require('./enum/project.enum');
 
 // model domains
 let ResponseData = require('./response-data');
@@ -22,10 +21,6 @@ exports = module.exports = () => {
             res.socket.setTimeout(7200000);
             let isMobile = AppUtil.isMobile(req.headers['user-agent']);
             let device = isMobile ? 'mobile' : 'desktop';
-            let projectName = _.filter(projectEnum, function (o) {
-                return o.id == req.headers.project;
-            });
-            projectName = projectName[0] || {};
             let user = req.headers.username || req.body.username || '##';
             let params = AppUtil.clone(req.body) || {};
             if (params.password) {
@@ -33,7 +28,7 @@ exports = module.exports = () => {
             }
             params = JSON.stringify(params, null, 4);
             let method = req.method.toUpperCase();
-            let logStr = "[RESQUEST] - URL: [" + method + "] '" + req.originalUrl + "' | USER: '" + user + "' | PROJECT: '" + projectName.name + "' | DEVICE: '" + device + "'";
+            let logStr = "[RESQUEST] - URL: [" + method + "] '" + req.originalUrl + "' | USER: '" + user + "' | DEVICE: '" + device + "'";
             if (method != 'GET') {
                 logStr += " BODY: '\n" + params + "'";
             }

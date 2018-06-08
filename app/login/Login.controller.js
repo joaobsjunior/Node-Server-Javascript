@@ -17,12 +17,8 @@ class LoginController {
     }
 
     loginData() {
-        if (!this.login.username) {
-            this.response.message.setMessage(messageEnum.msg01, messageEnum.fieldUsername);
-            return this.response;
-        }
-        if (!this.login.password) {
-            this.response.message.setMessage(messageEnum.msg01, messageEnum.fieldPassword);
+        if (!this.login.username || !this.login.password) {
+            this.response.message.setMessage(messageEnum.server412);
             return this.response;
         }
         return true;
