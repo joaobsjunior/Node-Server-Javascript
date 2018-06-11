@@ -1,6 +1,6 @@
 'use strict';
 
-let config = require('../config/config')();
+let config = require('./../config/config')();
 let logConfig = config.log;
 let logStreams = [];
 

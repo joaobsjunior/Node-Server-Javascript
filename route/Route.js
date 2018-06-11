@@ -2,7 +2,8 @@
 let path = require('path');
 let entryPoints = [
     '/cep/CEP.service.js',
-    '/manager/login/Login.service.js'
+    '/manager/login/Login.service.js',
+    '/manager/login/lost-password/LostPassword.service.js',
 ];
 class Route {
     constructor() {
@@ -11,7 +12,7 @@ class Route {
     static factory(Factory) {
         let basePath = '';
         entryPoints.forEach((value, index) => {
-            let basePath = path.resolve(__dirname, '../app' + value);
+            let basePath = path.resolve(__dirname, './../app' + value);
             Factory.create(basePath);
         });
     }

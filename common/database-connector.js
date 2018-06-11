@@ -1,5 +1,5 @@
 'use strict';
-const baseEnum = require('../common/enum/database.enum');
+const baseEnum = require('./../common/enum/database.enum');
 let path = require('path');
 let fs = require('fs');
 
@@ -7,7 +7,7 @@ const util = require('util');
 const appUtil = require('./app-util');
 let _ = require('lodash');
 
-const dbConfig = require('../config/dbconfig');
+const dbConfig = require('./../config/dbconfig');
 let respData = require('./response-data');
 
 // database libs
@@ -15,7 +15,7 @@ let tunnel = require('tunnel-ssh');
 let JDBC = require('jdbc');
 let jinst = require('jdbc/lib/jinst');
 let ResultSet = require('jdbc/lib/resultset');
-let JDBCResultSet = require('../java/JDBCResultSet');
+let JDBCResultSet = require('./../java/JDBCResultSet');
 let java = jinst.getInstance();
 let DatabaseGeneric = require('./database-generic');
 

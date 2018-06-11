@@ -1,10 +1,10 @@
 'use strict';
-const routeCreator = require('../../common/route-creator')();
+const routeCreator = require('./../../common/route-creator')();
 
-let AppUtil = require('../../common/app-util');
-let Response = require('../../common/model/Response.model');
-let ResponseData = require('../../common/response-data');
-const messageEnum = require('../../common/enum/message.enum');
+let AppUtil = require('./../../common/app-util');
+let Response = require('./../../common/model/Response.model');
+let ResponseData = require('./../../common/response-data');
+const messageEnum = require('./../../common/enum/message.enum');
 let _ = require('lodash');
 let request = require('request');
 let fs = require('fs');
@@ -33,21 +33,36 @@ class CEPService {
 			let body = compiled({
 				zipCode: req.params.zipCode
 			});
-			let address = { zipCode: req.params.zipCode };
+			let address = {
+				zipCode: req.params.zipCode
+			};
 			let uri = "https://apps.correios.com.br/SigepMasterJPA/AtendeClienteService/AtendeCliente?wsdl";
-			request.post(uri, { body: body, headers: { 'Content-Type': 'text/xml; charset=utf-8' } }, (error, response, body) => {
+			request.post(uri, {
+				body: body,
+				headers: {
+					'Content-Type': 'text/xml; charset=utf-8'
+				}
+			}, (error, response, body) => {
+				let faultstring = body.match(/<faultstring>(.*?)<\/faultstring>/);
+				if (faultstring) {
+					error = error || new Error(faultstring[1]);
+				}
 				if (error) {
 					console.error(error);
 					ResponseData.errorResponse(error, (data) => {
-						data.message.setMessage(messageEnum.server422);
+						if (faultstring) {
+							data.message.setMessage(faultstring);
+						} else {
+							data.message.setMessage(messageEnum.server422);
+						}
 						res.send(data);
 						res.end();
 					});
 				} else {
 					try {
 						address.district = body.match(/<bairro>(.*?)<\/bairro>/)[1].toUpperCase();
-						address.state = body.match(/<uf>(.*?)<\/uf>/)[1];
-						address.city = body.match(/<cidade>(.*?)<\/cidade>/)[1];
+						address.state = body.match(/<uf>(.*?)<\/uf>/)[1].toUpperCase();
+						address.city = body.match(/<cidade>(.*?)<\/cidade>/)[1].toUpperCase();
 						address.address = body.match(/<end>(.*?)<\/end>/)[1].toUpperCase();
 						address.isComplete = true;
 						ResponseData.successResponse(address, (data) => {

@@ -6,8 +6,8 @@ const base64url = require('base64url');
 const jws = require('jws');
 const _ = require('lodash');
 const AppUtil = require('./app-util');
-let LoginRepository = require('../app/manager/login/Login.persistence');
-let Login = require('../app/manager/login/Login.model');
+let LoginRepository = require('./../app/manager/login/Login.persistence');
+let Login = require('./../app/manager/login/Login.model');
 let CryptoJS = require("crypto-js");
 
 // model domains

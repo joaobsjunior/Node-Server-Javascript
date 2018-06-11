@@ -1,5 +1,5 @@
 'use strict';
-const baseEnum = require('../common/enum/database.enum');
+const baseEnum = require('./../common/enum/database.enum');
 
 module.exports = {
   GSENSEX: {

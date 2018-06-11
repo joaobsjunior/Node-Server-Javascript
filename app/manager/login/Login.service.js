@@ -1,17 +1,17 @@
 'use strict';
 
 // constants
-const routeCreator = require('../../../common/route-creator')();
-const messageEnum = require('../../../common/enum/message.enum');
+const routeCreator = require('./../../../common/route-creator')();
+const messageEnum = require('./../../../common/enum/message.enum');
 
 // repository patterns
 let LoginRepository = require('./Login.persistence');
 
 // model domains
 let Login = require('./Login.model');
-let AppUtil = require('../../../common/app-util');
-let Response = require('../../../common/model/Response.model');
-let ResponseData = require('../../../common/response-data');
+let AppUtil = require('./../../../common/app-util');
+let Response = require('./../../../common/model/Response.model');
+let ResponseData = require('./../../../common/response-data');
 
 //controller
 let LoginController = require('./Login.controller');

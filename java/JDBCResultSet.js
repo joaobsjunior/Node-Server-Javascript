@@ -1,7 +1,7 @@
 let java;
 let path = require('path');
 let _ = require('lodash');
-let appUtil = require('../common/app-util');
+let appUtil = require('./../common/app-util');
 let numRows = 5000;
 
 class JDBCResultSet {
