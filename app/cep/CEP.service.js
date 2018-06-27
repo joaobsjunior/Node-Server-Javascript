@@ -60,10 +60,10 @@ class CEPService {
 					});
 				} else {
 					try {
-						address.district = body.match(/<bairro>(.*?)<\/bairro>/)[1].toUpperCase();
-						address.state = body.match(/<uf>(.*?)<\/uf>/)[1].toUpperCase();
-						address.city = body.match(/<cidade>(.*?)<\/cidade>/)[1].toUpperCase();
-						address.address = body.match(/<end>(.*?)<\/end>/)[1].toUpperCase();
+						address.district = body.match(/<bairro>(.*?)<\/bairro>/)[1];
+						address.state = body.match(/<uf>(.*?)<\/uf>/)[1];
+						address.city = body.match(/<cidade>(.*?)<\/cidade>/)[1];
+						address.address = body.match(/<end>(.*?)<\/end>/)[1];
 						address.isComplete = true;
 						ResponseData.successResponse(address, (data) => {
 							res.send(data);

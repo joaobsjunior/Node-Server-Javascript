@@ -3,7 +3,6 @@ let path = require('path');
 let entryPoints = [
     '/cep/CEP.service.js',
     '/manager/login/Login.service.js',
-    '/manager/login/lost-password/LostPassword.service.js',
 ];
 class Route {
     constructor() {
