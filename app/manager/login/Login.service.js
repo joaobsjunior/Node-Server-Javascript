@@ -5,7 +5,7 @@ const routeCreator = require('./../../../common/route-creator')();
 const messageEnum = require('./../../../common/enum/message.enum');
 
 // repository patterns
-let LoginRepository = require('./Login.persistence');
+let LoginRepository = require('./Login.repository');
 
 // model domains
 let Login = require('./Login.model');
