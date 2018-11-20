@@ -7,7 +7,9 @@ Este documento tem como objetivo instruir os usuários a instalar e rodar o sand
 - Instale o Nodejs
 - Instale o Python 2.7.x (3.x não é suportado)
 - Instale as Ferramentas de Build (Apenas Windows) `` npm install --global --production windows-build-tools ``
-- Instale do Node-Gyp ``` npm install -g node-gyp ```
+- Instale do Node-Gyp `` npm install -g node-gyp ``
+- Set o Python2.7 como principal `` npm config set python python2.7 ``
+- Set a versão do build tools como 2017 `` npm config set msvs_version 2017 ``
 - Instale as dependências (**apenas dependências**) do pdf-extract (ver: https://www.npmjs.com/package/pdf-extract)
 - Instale as dependências do node no projeto:
 ```
