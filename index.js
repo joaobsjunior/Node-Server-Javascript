@@ -66,7 +66,8 @@ var
 	helmet,
 	interceptor,
 	token,
-	httpOptions;
+    	fs,
+    	httpOptions;
 
 let os = require('os');
 const jws = require('jws');
@@ -94,6 +95,9 @@ function setDependencies() {
 	global.config = config;
 	
 	let temp = path.resolve(config.paths.root,'tmp');
+	if(!fs.existsSync(temp)){
+		fs.mkdirSync(temp);
+	}
 	process.env.TMPDIR = temp;
 	process.env.TMP = temp;
 	process.env.TEMP = temp;
