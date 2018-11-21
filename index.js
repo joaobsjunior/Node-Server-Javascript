@@ -92,6 +92,11 @@ function setDependencies() {
 	config.paths.root = path.resolve(__dirname);
 	config.paths.app = path.resolve(__dirname) + '/app/resources/sales';
 	global.config = config;
+	
+	let temp = path.resolve(config.paths.root,'tmp');
+	process.env.TMPDIR = temp;
+	process.env.TMP = temp;
+	process.env.TEMP = temp;
 
 	global.interceptor = interceptor;
 
