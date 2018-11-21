@@ -28,8 +28,8 @@ class LoginService {
 
 
 		//INSERT
-		this._login = (req, res) => {
-			let params = AppUtil.getParams(req, res);
+		this._login = async (req, res) => {
+			let params = await AppUtil.getParams(req);
 			let login = new Login();
 
 			try {

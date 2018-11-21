@@ -19,32 +19,28 @@ class AppUtil {
         AppUtil.showEmptyValues(arr, bindVars);
     }
 
-    static getParams(req, res, callback) {
-        let isFormData = req.headers["content-type"].indexOf('multipart/form-data') == 0;
-        if (isFormData) {
-            if (!callback) {
-                let errMsg = "'callback' is undefined in AppUtil.getParams(req, callback)";
-                let err = new Error(errMsg);
-                res.status(500);
-                ResponseData.errorResponse(err, (data) => {
-                    data.message.setMessage(messageEnum.server500);
-                    res.send(data);
-                    res.end();
-                });
-                throw errMsg;
-            }
-            let {
-                IncomingForm
-            } = require('formidable');
-            let form = new IncomingForm();
-            form.parse(req, (err, fields, files) => {
-                callback(err, fields, files);
-            });
-        } else {
+    static getParams(req) {
+        return new Promise((resolve, reject) => {
             let params = Object.assign(req.body, req.query);
             params = Object.assign(params, req.params);
-            return params;
-        }
+            let isFormData = req.headers["content-type"] && req.headers["content-type"].indexOf('multipart/form-data') == 0;
+            if (isFormData) {
+                let {
+                    IncomingForm
+                } = require('formidable');
+                let form = new IncomingForm();
+                form.parse(req, (err, fields, files) => {
+                    if (err) {
+                        resolve(params);
+                    }else{
+                        params = Object.assign(fields, files);
+                        resolve(params);
+                    }
+                });
+            } else {
+                resolve(params);
+            }
+        });
     }
 
     static showParamsNotPresent(arr, bindVars) {

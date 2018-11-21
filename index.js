@@ -66,8 +66,8 @@ var
 	helmet,
 	interceptor,
 	token,
-    	fs,
-    	httpOptions;
+	fs,
+	httpOptions;
 
 let os = require('os');
 const jws = require('jws');
@@ -84,6 +84,7 @@ function setDependencies() {
 	httpCommand = require('http');
 	express = require('express');
 	helmet = require('helmet')
+	fs = require('fs');
 	bodyParser = require('body-parser');
 
 	global.mail = mail;
@@ -93,9 +94,9 @@ function setDependencies() {
 	config.paths.root = path.resolve(__dirname);
 	config.paths.app = path.resolve(__dirname) + '/app/resources/sales';
 	global.config = config;
-	
-	let temp = path.resolve(config.paths.root,'tmp');
-	if(!fs.existsSync(temp)){
+
+	let temp = path.resolve(config.paths.root, 'tmp');
+	if (!fs.existsSync(temp)) {
 		fs.mkdirSync(temp);
 	}
 	process.env.TMPDIR = temp;
