@@ -124,28 +124,31 @@ function configServer() {
 
 	app.use(helmet());
 
-	// Allowing CORS for communication
+	// Allowing CORS only for origins listed in CORS_ORIGINS
 	app.use((req, res, next) => {
-		res.header("Access-Control-Allow-Origin", "*");
-		res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, token");
-		res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+		let origin = req.headers.origin;
+		if (origin && config.cors.origins.indexOf(origin) !== -1) {
+			res.header("Access-Control-Allow-Origin", origin);
+			res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, token");
+			res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+		}
 		next();
 	});
 
 	app.use(bodyParser.urlencoded({
-		limit: '50mb',
+		limit: config.server.bodyLimit,
 		extended: false
 	}));
 
 	app.use(bodyParser.json({
-		limit: '50mb'
+		limit: config.server.bodyLimit
 	}));
 
 	let httpOptions = require('./common/http-options')();
 	httpOptions.localParam.version = 'api';
 	httpOptions.localParam.pathBase = '';
-	httpOptions.gatewayParam.hostName = '10.200.1.190';
-	httpOptions.gatewayParam.port = 7101;
+	httpOptions.gatewayParam.hostName = config.gateway.hostName;
+	httpOptions.gatewayParam.port = config.gateway.port;
 	httpOptions.gatewayParam.pathBase = '/servico/rest';
 
 	let Factory = new require('./common/resource-factory')(app, httpOptions);
@@ -217,18 +220,5 @@ function init() {
 	// readRoutes ();
 	startServer();
 }
-
-(function () {
-	var childProcess = require("child_process");
-	var oldSpawn = childProcess.spawn;
-
-	function mySpawn() {
-		console.log('spawn called');
-		console.log(arguments);
-		var result = oldSpawn.apply(this, arguments);
-		return result;
-	}
-	childProcess.spawn = mySpawn;
-})();
 
 init();

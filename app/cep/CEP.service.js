@@ -6,7 +6,6 @@ let Response = require('./../../common/model/Response.model');
 let ResponseData = require('./../../common/response-data');
 const messageEnum = require('./../../common/enum/message.enum');
 let _ = require('lodash');
-let request = require('request');
 let fs = require('fs');
 
 class CEPService {
@@ -37,33 +36,28 @@ class CEPService {
 				zipCode: req.params.zipCode
 			};
 			let uri = "https://apps.correios.com.br/SigepMasterJPA/AtendeClienteService/AtendeCliente?wsdl";
-			request.post(uri, {
+			fetch(uri, {
+				method: 'POST',
 				body: body,
 				headers: {
 					'Content-Type': 'text/xml; charset=utf-8'
 				}
-			}, (error, response, body) => {
-				let faultstring = body.match(/<faultstring>(.*?)<\/faultstring>/);
+			}).then((response) => response.text()).then((responseBody) => {
+				let faultstring = responseBody.match(/<faultstring>(.*?)<\/faultstring>/);
 				if (faultstring) {
-					error = error || new Error(faultstring[1]);
-				}
-				if (error) {
+					let error = new Error(faultstring[1]);
 					console.error(error);
 					ResponseData.errorResponse(error, (data) => {
-						if (faultstring) {
-							data.message.setMessage(faultstring);
-						} else {
-							data.message.setMessage(messageEnum.server422);
-						}
+						data.message.setMessage(faultstring);
 						res.send(data);
 						res.end();
 					});
 				} else {
 					try {
-						address.district = body.match(/<bairro>(.*?)<\/bairro>/)[1];
-						address.state = body.match(/<uf>(.*?)<\/uf>/)[1];
-						address.city = body.match(/<cidade>(.*?)<\/cidade>/)[1];
-						address.address = body.match(/<end>(.*?)<\/end>/)[1];
+						address.district = responseBody.match(/<bairro>(.*?)<\/bairro>/)[1];
+						address.state = responseBody.match(/<uf>(.*?)<\/uf>/)[1];
+						address.city = responseBody.match(/<cidade>(.*?)<\/cidade>/)[1];
+						address.address = responseBody.match(/<end>(.*?)<\/end>/)[1];
 						address.isComplete = true;
 						ResponseData.successResponse(address, (data) => {
 							res.send(data);
@@ -78,6 +72,13 @@ class CEPService {
 						});
 					}
 				}
+			}).catch((error) => {
+				console.error(error);
+				ResponseData.errorResponse(error, (data) => {
+					data.message.setMessage(messageEnum.server422);
+					res.send(data);
+					res.end();
+				});
 			})
 
 		}

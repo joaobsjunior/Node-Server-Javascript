@@ -16,6 +16,42 @@ Este documento tem como objetivo instruir os usuários a instalar e rodar o sand
 #!shell-script
 npm i
 ```
+### Variáveis de ambiente ###
+
+O servidor lê sua configuração de variáveis de ambiente (ver `.env.example` para a lista completa com placeholders).
+
+**Obrigatórias** (o servidor não inicia sem elas):
+
+| Variável | Descrição |
+| --- | --- |
+| `KEY_REQUEST_AUTH` | Chave de criptografia do token de autenticação das requisições |
+
+**Opcionais** (com defaults seguros):
+
+| Variável | Default | Descrição |
+| --- | --- | --- |
+| `PORT` | `9090` | Porta HTTP do servidor |
+| `BODY_LIMIT` | `1mb` | Limite do corpo das requisições (JSON e urlencoded) |
+| `CORS_ORIGINS` | vazio | Origens permitidas para CORS, separadas por vírgula. Vazio = sem cabeçalhos CORS |
+| `LDAP_URL` | `ldap://0.0.0.0:389` | URL do servidor LDAP |
+| `LDAP_BASE_DN` | `dc=domain,dc=local` | Base DN do LDAP |
+| `LDAP_USERNAME` | vazio | Usuário LDAP |
+| `LDAP_PASSWORD` | vazio | Senha LDAP |
+| `MAIL_HOST` | vazio | Host SMTP |
+| `MAIL_PORT` | `587` | Porta SMTP |
+| `MAIL_USER` / `MAIL_PASS` | vazio | Credenciais SMTP. Se ausentes, o envio de e-mail é desabilitado |
+| `MAIL_FROM` / `MAIL_TO` | vazio | Remetente e destinatário padrão dos e-mails |
+| `GATEWAY_HOST` / `GATEWAY_PORT` | vazio | Host e porta do gateway SOA |
+
+Exemplo:
+
+```
+#!shell-script
+cp .env.example .env   # edite os valores
+export KEY_REQUEST_AUTH="sua-chave-secreta"
+npm start
+```
+
 - Instale o pm2 caso não tenha:
 ```
 #!shell-script

@@ -1,7 +1,7 @@
 'use strict';
 const messageEnum = require('./enum/message.enum');
 const ResponseData = require('./response-data');
-const _array = require('lodash-compat/array');
+const _array = require('lodash');
 let Mensagem = require('./model/Message.model');
 let _ = require('lodash');
 
@@ -33,7 +33,16 @@ class AppUtil {
                     if (err) {
                         resolve(params);
                     }else{
-                        params = Object.assign(fields, files);
+                        // formidable v3 entrega campos/arquivos como arrays; desembrulha valores únicos
+                        let unwrap = (source) => {
+                            let result = {};
+                            Object.keys(source).forEach((key) => {
+                                let value = source[key];
+                                result[key] = (Array.isArray(value) && value.length === 1) ? value[0] : value;
+                            });
+                            return result;
+                        };
+                        params = Object.assign(unwrap(fields), unwrap(files));
                         resolve(params);
                     }
                 });

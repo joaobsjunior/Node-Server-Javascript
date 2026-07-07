@@ -1,5 +1,43 @@
 "use strict";
 
+/**
+ * requireEnv - Reads a required environment variable.
+ * Aborts the process with a clear message (naming the variable, never its value)
+ * when it is missing.
+ */
+function requireEnv(name) {
+    let value = process.env[name];
+    if (value === undefined || value === "") {
+        console.error("[config] Variável de ambiente obrigatória ausente: " + name);
+        console.error("[config] Defina " + name + " antes de iniciar o servidor (ver .env.example).");
+        process.exit(1);
+    }
+    return value;
+}
+
+/**
+ * optionalEnv - Reads an optional environment variable, falling back to a default.
+ */
+function optionalEnv(name, defaultValue) {
+    let value = process.env[name];
+    if (value === undefined || value === "") {
+        return defaultValue;
+    }
+    return value;
+}
+
+let mailUser = optionalEnv("MAIL_USER", null);
+let mailPass = optionalEnv("MAIL_PASS", null);
+let sendEmail = Boolean(mailUser && mailPass);
+if (!sendEmail) {
+    console.warn("[config] MAIL_USER/MAIL_PASS não definidas: envio de e-mail desabilitado (sendEmail=false).");
+}
+
+let corsOrigins = optionalEnv("CORS_ORIGINS", "")
+    .split(",")
+    .map(function (origin) { return origin.trim(); })
+    .filter(function (origin) { return origin.length > 0; });
+
 let config = {
     app: {
         name: "Node Server - API",
@@ -11,31 +49,39 @@ let config = {
     loadedRoutes: [],
     encoding: "utf8",
     ldap: {
-        url: "ldap://0.0.0.0:389",
-        baseDN: "dc=domain,dc=local",
-        username: "user@domain.com",
-        password: "password"
+        url: optionalEnv("LDAP_URL", "ldap://0.0.0.0:389"),
+        baseDN: optionalEnv("LDAP_BASE_DN", "dc=domain,dc=local"),
+        username: optionalEnv("LDAP_USERNAME", ""),
+        password: optionalEnv("LDAP_PASSWORD", "")
     },
-    keyRequestAutentication: "@1b%2c^3d&4#$",
+    keyRequestAutentication: requireEnv("KEY_REQUEST_AUTH"),
+    cors: {
+        origins: corsOrigins
+    },
+    gateway: {
+        hostName: optionalEnv("GATEWAY_HOST", ""),
+        port: parseInt(optionalEnv("GATEWAY_PORT", "0"), 10)
+    },
     server: {
-        port: 9090,
+        port: parseInt(optionalEnv("PORT", "9090"), 10),
         // Loaded after the app boot
         actualPort: "",
         disableInterceptor: true,
         debugPosts: true,
         maxRows: 1000,
+        bodyLimit: optionalEnv("BODY_LIMIT", "1mb"),
         mail: {
             service: "smtp",
-            host: "smtp@domain.com.br",
-            port: 587,
+            host: optionalEnv("MAIL_HOST", ""),
+            port: parseInt(optionalEnv("MAIL_PORT", "587"), 10),
             auth: {
-                user: "username",
-                pass: "password"
+                user: mailUser,
+                pass: mailPass
             },
             subjectPrefix: "Node Server | ",
-            sendEmail: true, // para desabilitar envio de email: false.
-            overrideFrom: "no-reply@domain.com.br",
-            overrideTo: "contact@domain.com.br"
+            sendEmail: sendEmail,
+            overrideFrom: optionalEnv("MAIL_FROM", ""),
+            overrideTo: optionalEnv("MAIL_TO", "")
         }
     },
     paths: {

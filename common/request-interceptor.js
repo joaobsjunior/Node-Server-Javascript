@@ -23,6 +23,8 @@ exports = module.exports = () => {
         loginRepository.checkLogin(login, res, (data) => {
             if (data.isSuccess && data.size) {
                 callback(true, null);
+            } else {
+                callback(false, null);
             }
         })
     };
@@ -51,7 +53,7 @@ exports = module.exports = () => {
                 let swaggerParams = swagger.paths[path][req.method.toLowerCase()];
                 let requireAD = groupADArray = swaggerParams['requireAD'];
                 if (swaggerParams['onlyLocalhost'] && req.headers.host.toLowerCase().indexOf('localhost') != 0) {
-                    res.status(500);
+                    res.status(403);
                     ResponseData.errorResponse(new Error(), (data) => {
                         res.send(data);
                         res.end();
@@ -63,15 +65,25 @@ exports = module.exports = () => {
                     return;
                 }
                 if (!req.headers.token) {
-                    res.status(500);
+                    res.status(401);
                     ResponseData.errorResponse(new Error(), (data) => {
                         res.send(data);
                         res.end();
                     });
                     return;
                 }
-                let userdata = CryptoJS.AES.decrypt(String(req.headers.token), global.config.keyRequestAutentication).toString(CryptoJS.enc.Utf8);
-                userdata = JSON.parse(userdata);
+                let userdata;
+                try {
+                    userdata = CryptoJS.AES.decrypt(String(req.headers.token), global.config.keyRequestAutentication).toString(CryptoJS.enc.Utf8);
+                    userdata = JSON.parse(userdata);
+                } catch (e) {
+                    res.status(401);
+                    ResponseData.errorResponse(new Error(), (data) => {
+                        res.send(data);
+                        res.end();
+                    });
+                    return;
+                }
                 let email = userdata.email;
                 let password = userdata.password;
                 checkAuth(email, password, res, groups, (auth, message) => {
@@ -79,8 +91,11 @@ exports = module.exports = () => {
                         next();
                         return;
                     } else {
-                        res.send(message);
-                        res.end();
+                        res.status(401);
+                        ResponseData.errorResponse(new Error(), (data) => {
+                            res.send(data);
+                            res.end();
+                        });
                         return;
                     }
                 });
