@@ -1,0 +1,237 @@
+{
+  ".vscode/launch.json": {
+    "mtime": 1783442026.9886806,
+    "ast_hash": "1d012b1e8cf264962cd90c51795f04a0",
+    "semantic_hash": "1d012b1e8cf264962cd90c51795f04a0"
+  },
+  ".vscode/settings.json": {
+    "mtime": 1783442026.9887643,
+    "ast_hash": "9dc42cb017209291ef2fe46fec445649",
+    "semantic_hash": "9dc42cb017209291ef2fe46fec445649"
+  },
+  "app/cep/CEP.service.js": {
+    "mtime": 1783445843.6284125,
+    "ast_hash": "03efc06b9a43d6ad45b40b3e9cd35800",
+    "semantic_hash": "03efc06b9a43d6ad45b40b3e9cd35800"
+  },
+  "app/manager/login/Login.controller.js": {
+    "mtime": 1783442026.9892557,
+    "ast_hash": "6a7acaf62e4307b20d4dcc339009988d",
+    "semantic_hash": "6a7acaf62e4307b20d4dcc339009988d"
+  },
+  "app/manager/login/Login.model.js": {
+    "mtime": 1783442026.9893408,
+    "ast_hash": "c1983f7b5412bb41e54b89bf6b239c99",
+    "semantic_hash": "c1983f7b5412bb41e54b89bf6b239c99"
+  },
+  "app/manager/login/Login.repository.js": {
+    "mtime": 1783442026.9894269,
+    "ast_hash": "eb57355d8bac87ce707e29f72f2fd87f",
+    "semantic_hash": "eb57355d8bac87ce707e29f72f2fd87f"
+  },
+  "app/manager/login/Login.service.js": {
+    "mtime": 1783442026.9895248,
+    "ast_hash": "507e3b1c9e72de83c3568c94eb7a0dc2",
+    "semantic_hash": "507e3b1c9e72de83c3568c94eb7a0dc2"
+  },
+  "common/app-util.js": {
+    "mtime": 1783445846.8874247,
+    "ast_hash": "764eee5e0e8df69b5fad275328f598d2",
+    "semantic_hash": "764eee5e0e8df69b5fad275328f598d2"
+  },
+  "common/database-connector.js": {
+    "mtime": 1783442026.989989,
+    "ast_hash": "d594cc05f8fae6fcc9309fdee122ee7b",
+    "semantic_hash": "d594cc05f8fae6fcc9309fdee122ee7b"
+  },
+  "common/database-generic.js": {
+    "mtime": 1783442026.9900737,
+    "ast_hash": "a1e6f1cb56c6b5708f2ec683ff635e77",
+    "semantic_hash": "a1e6f1cb56c6b5708f2ec683ff635e77"
+  },
+  "common/enum/database.enum.js": {
+    "mtime": 1783442027.0105617,
+    "ast_hash": "7bcff66292bde8669752a72ae5088dfa",
+    "semantic_hash": "7bcff66292bde8669752a72ae5088dfa"
+  },
+  "common/enum/message.enum.js": {
+    "mtime": 1783442027.010641,
+    "ast_hash": "073c3909e31f1e95a2bb83e8a7667e97",
+    "semantic_hash": "073c3909e31f1e95a2bb83e8a7667e97"
+  },
+  "common/enum/sqltype.enum.js": {
+    "mtime": 1783442027.0107112,
+    "ast_hash": "6d497bff540e585d18e6abde3ce2387a",
+    "semantic_hash": "6d497bff540e585d18e6abde3ce2387a"
+  },
+  "common/http-options.js": {
+    "mtime": 1783442027.0107768,
+    "ast_hash": "83d2fd6d7b43d3f4c1ce006b0279713b",
+    "semantic_hash": "83d2fd6d7b43d3f4c1ce006b0279713b"
+  },
+  "common/mailer.js": {
+    "mtime": 1783442027.0108397,
+    "ast_hash": "c8b0379d39439945950a16d9297f616a",
+    "semantic_hash": "c8b0379d39439945950a16d9297f616a"
+  },
+  "common/model/Message.model.js": {
+    "mtime": 1783442027.0109398,
+    "ast_hash": "1310c9ff150c20a8af2b30ccdd18b41d",
+    "semantic_hash": "1310c9ff150c20a8af2b30ccdd18b41d"
+  },
+  "common/model/Response.model.js": {
+    "mtime": 1783442027.011008,
+    "ast_hash": "74bd1c33029a57302ddb4909ff604a35",
+    "semantic_hash": "74bd1c33029a57302ddb4909ff604a35"
+  },
+  "common/request-interceptor.js": {
+    "mtime": 1783444662.1748521,
+    "ast_hash": "5747447785b7a03600362b665a57a683",
+    "semantic_hash": "5747447785b7a03600362b665a57a683"
+  },
+  "common/resource-base.js": {
+    "mtime": 1783442027.011175,
+    "ast_hash": "4fb2c89893529462e5f69670ea07906b",
+    "semantic_hash": "4fb2c89893529462e5f69670ea07906b"
+  },
+  "common/resource-factory.js": {
+    "mtime": 1783442027.0112383,
+    "ast_hash": "896fd1290f974a9469b93894623ba780",
+    "semantic_hash": "896fd1290f974a9469b93894623ba780"
+  },
+  "common/response-data.js": {
+    "mtime": 1783442027.0112982,
+    "ast_hash": "294e8999659cda11963a6d2776d9049e",
+    "semantic_hash": "294e8999659cda11963a6d2776d9049e"
+  },
+  "common/route-creator.js": {
+    "mtime": 1783442027.0113535,
+    "ast_hash": "18ffaa65e971f376ab7f99557e0f6b2b",
+    "semantic_hash": "18ffaa65e971f376ab7f99557e0f6b2b"
+  },
+  "common/soa-connector.js": {
+    "mtime": 1783442027.0114176,
+    "ast_hash": "7d31d329c9d9c9e59ee1ae72393f3efc",
+    "semantic_hash": "7d31d329c9d9c9e59ee1ae72393f3efc"
+  },
+  "config/config.js": {
+    "mtime": 1783444626.8628879,
+    "ast_hash": "cc50b5f0428ae2786fa65c462e93ed6f",
+    "semantic_hash": "cc50b5f0428ae2786fa65c462e93ed6f"
+  },
+  "config/dbconfig.js": {
+    "mtime": 1783442027.0115964,
+    "ast_hash": "6379b7c4e39e73e4d3b7821d3d90b7fa",
+    "semantic_hash": "6379b7c4e39e73e4d3b7821d3d90b7fa"
+  },
+  "config/routes/routes.js": {
+    "mtime": 1783442027.011712,
+    "ast_hash": "8abcb9c94b46b33418033df8e5eba4c6",
+    "semantic_hash": "8abcb9c94b46b33418033df8e5eba4c6"
+  },
+  "index.js": {
+    "mtime": 1783444641.411367,
+    "ast_hash": "ac563d36285fe29e20be732e8c50d36d",
+    "semantic_hash": "ac563d36285fe29e20be732e8c50d36d"
+  },
+  "java/JDBCResultSet.js": {
+    "mtime": 1783442027.0119486,
+    "ast_hash": "38eb8663804b64e155a5996e633b4d38",
+    "semantic_hash": "38eb8663804b64e155a5996e633b4d38"
+  },
+  "lock-model.json": {
+    "mtime": 1783442027.0119746,
+    "ast_hash": "d41d8cd98f00b204e9800998ecf8427e",
+    "semantic_hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "log/log.js": {
+    "mtime": 1783442027.0120845,
+    "ast_hash": "dd8eb4d138b7585cecdf34d63d8114c7",
+    "semantic_hash": "dd8eb4d138b7585cecdf34d63d8114c7"
+  },
+  "package.json": {
+    "mtime": 1783445848.245831,
+    "ast_hash": "31f83724d7183b98f66166497cfedc0f",
+    "semantic_hash": "31f83724d7183b98f66166497cfedc0f"
+  },
+  "report.js": {
+    "mtime": 1783442027.0122173,
+    "ast_hash": "81566d577dc8f0ebfd13f63551bdd1d2",
+    "semantic_hash": "81566d577dc8f0ebfd13f63551bdd1d2"
+  },
+  "route/Route.js": {
+    "mtime": 1783442027.0123224,
+    "ast_hash": "8c3427d11586825e4ef1fe972d6c9193",
+    "semantic_hash": "8c3427d11586825e4ef1fe972d6c9193"
+  },
+  "sql/login/login-check.sql": {
+    "mtime": 1783442027.0124483,
+    "ast_hash": "6b910533380767c4092e6c09de6594a9",
+    "semantic_hash": "6b910533380767c4092e6c09de6594a9"
+  },
+  "sql/login/login.sql": {
+    "mtime": 1783442027.0125103,
+    "ast_hash": "6575f96e3ad0b2ac7e68af2190738079",
+    "semantic_hash": "6575f96e3ad0b2ac7e68af2190738079"
+  },
+  "sql/manager/login/login-check.sql": {
+    "mtime": 1783442027.0126357,
+    "ast_hash": "c2438a3ece0d344f37eb18c0008681bf",
+    "semantic_hash": "c2438a3ece0d344f37eb18c0008681bf"
+  },
+  "sql/manager/login/login.sql": {
+    "mtime": 1783442027.012687,
+    "ast_hash": "1b26ec9d481a0d2e53e674aeeb4b10b6",
+    "semantic_hash": "1b26ec9d481a0d2e53e674aeeb4b10b6"
+  },
+  "utils/utils.js": {
+    "mtime": 1783442027.0127888,
+    "ast_hash": "e7973abb0e8fc62c8ba68bd0c18a1b8c",
+    "semantic_hash": "e7973abb0e8fc62c8ba68bd0c18a1b8c"
+  },
+  "README.md": {
+    "mtime": 1783444693.064644,
+    "ast_hash": "069c14e6e0809ee8d3b7e9b858c26ff0",
+    "semantic_hash": "069c14e6e0809ee8d3b7e9b858c26ff0"
+  },
+  "index.yaml": {
+    "mtime": 1783442027.011843,
+    "ast_hash": "088519679907c15d7cede79a5955aeaa",
+    "semantic_hash": "088519679907c15d7cede79a5955aeaa"
+  },
+  "openspec/changes/harden-server-security/.openspec.yaml": {
+    "mtime": 1783444034.9985561,
+    "ast_hash": "03897143b56ed2249b1ec0993bfa708d",
+    "semantic_hash": "03897143b56ed2249b1ec0993bfa708d"
+  },
+  "openspec/changes/harden-server-security/design.md": {
+    "mtime": 1783444143.399021,
+    "ast_hash": "e087a8c115849535228277eca41f25ba",
+    "semantic_hash": "e087a8c115849535228277eca41f25ba"
+  },
+  "openspec/changes/harden-server-security/proposal.md": {
+    "mtime": 1783444069.4816055,
+    "ast_hash": "24d724aea983ba7db09d694c7d1c6123",
+    "semantic_hash": "24d724aea983ba7db09d694c7d1c6123"
+  },
+  "openspec/changes/harden-server-security/specs/request-security/spec.md": {
+    "mtime": 1783444105.2613335,
+    "ast_hash": "01ba2e9f193792cbc141e459ad8c730c",
+    "semantic_hash": "01ba2e9f193792cbc141e459ad8c730c"
+  },
+  "openspec/changes/harden-server-security/specs/secure-configuration/spec.md": {
+    "mtime": 1783444092.8434408,
+    "ast_hash": "fd31a307eb4105189543d1a296e2a347",
+    "semantic_hash": "fd31a307eb4105189543d1a296e2a347"
+  },
+  "openspec/changes/harden-server-security/tasks.md": {
+    "mtime": 1783445122.4757211,
+    "ast_hash": "1e8fa3ecc288f76f00566ee47be1fe46",
+    "semantic_hash": "1e8fa3ecc288f76f00566ee47be1fe46"
+  },
+  "openspec/config.yaml": {
+    "mtime": 1783444034.9963014,
+    "ast_hash": "5b97b9a47c1b7f856873488213a09145",
+    "semantic_hash": "5b97b9a47c1b7f856873488213a09145"
+  }
+}
