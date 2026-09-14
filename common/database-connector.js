@@ -18,6 +18,7 @@ let ResultSet = require('jdbc/lib/resultset');
 let JDBCResultSet = require('./../java/JDBCResultSet');
 let java = jinst.getInstance();
 let DatabaseGeneric = require('./database-generic');
+const sqlEscape = require('./sql-escape');
 
 // enums
 let sqlType = require('./enum/sqltype.enum');
@@ -34,21 +35,21 @@ exports = module.exports = () => {
         let results = resultSet.getObject();
         callback(results);
     };
-    let executeSQLQuery = (statement, SQL, callback) => {
+    let executeSQLQuery = (statement, SQL, callback, reportSQL) => {
         statement.executeQuery(SQL, (err, resultset) => {
             if (err) {
-                DatabaseGeneric.SQLReportEmail(SQL, err);
+                DatabaseGeneric.SQLReportEmail(reportSQL, err);
                 respData.errorResponse(err, callback);
             } else {
                 getDataOfResultSet(resultset, callback);
             }
         });
     };
-    let executeSQLUpdate = (statement, SQL, callback) => {
+    let executeSQLUpdate = (statement, SQL, callback, reportSQL) => {
         let Statement = java.import('java.sql.Statement');
         statement._s.executeUpdate(SQL, Statement.RETURN_GENERATED_KEYS, (err, count) => {
             if (err) {
-                DatabaseGeneric.SQLReportEmail(SQL, err);
+                DatabaseGeneric.SQLReportEmail(reportSQL, err);
                 respData.errorResponse(err, callback);
             } else {
                 let rs = statement._s.getGeneratedKeysSync();
@@ -66,7 +67,7 @@ exports = module.exports = () => {
             }
         });
     };
-    let executeSQLStatement = (conn, statement, SQL, callback) => {
+    let executeSQLStatement = (conn, statement, SQL, callback, reportSQL) => {
         conn._conn.setAutoCommitSync(autoCommit);
         let scripts = SQL.slice(0, -1).split(';');
         for (let i in scripts) {
@@ -76,12 +77,12 @@ exports = module.exports = () => {
         }
         statement._s.executeBatch((err, data) => {
             if (err) {
-                DatabaseGeneric.SQLReportEmail(SQL, err);
+                DatabaseGeneric.SQLReportEmail(reportSQL, err);
                 respData.errorResponse(err, callback);
             } else {
                 conn._conn.commit((err) => {
                     if (err) {
-                        DatabaseGeneric.SQLReportEmail(SQL, err);
+                        DatabaseGeneric.SQLReportEmail(reportSQL, err);
                         respData.errorResponse(err, callback);
                     } else {
                         let count = _.sum(data);
@@ -91,18 +92,18 @@ exports = module.exports = () => {
             }
         });
     };
-    let executeSQLInsert = (conn, SQL, callback) => {
+    let executeSQLInsert = (conn, SQL, callback, reportSQL) => {
         conn.prepareCall(SQL, (err, callablestatement) => {
             let JDBCTypes = java.import('java.sql.Types');
             if (err) {
-                DatabaseGeneric.SQLReportEmail(SQL, err);
+                DatabaseGeneric.SQLReportEmail(reportSQL, err);
                 respData.errorResponse(err, callback);
             } else {
                 callablestatement._cs.registerOutParameterSync(1, JDBCTypes.NUMERIC);
                 callablestatement._cs.registerOutParameterSync(2, JDBCTypes.NUMERIC);
                 callablestatement.execute((err, data) => {
                     if (err) {
-                        DatabaseGeneric.SQLReportEmail(SQL, err);
+                        DatabaseGeneric.SQLReportEmail(reportSQL, err);
                         respData.errorResponse(err, callback);
                     } else {
                         let result = {}
@@ -115,10 +116,10 @@ exports = module.exports = () => {
             }
         });
     };
-    let executeSQLProcedure = (conn, SQL, callback) => {
+    let executeSQLProcedure = (conn, SQL, callback, reportSQL) => {
         conn.prepareCall(SQL, (err, callablestatement) => {
             if (err) {
-                DatabaseGeneric.SQLReportEmail(SQL, err);
+                DatabaseGeneric.SQLReportEmail(reportSQL, err);
                 respData.errorResponse(err, callback);
             } else {
                 let withParameters = SQL.indexOf('?') != -1 ? true : false;
@@ -127,7 +128,7 @@ exports = module.exports = () => {
                 }
                 callablestatement.execute((err, data) => {
                     if (err) {
-                        DatabaseGeneric.SQLReportEmail(SQL, err);
+                        DatabaseGeneric.SQLReportEmail(reportSQL, err);
                         respData.errorResponse(err, callback);
                     } else {
                         let resultset = null;
@@ -143,22 +144,22 @@ exports = module.exports = () => {
             }
         });
     };
-    let filterSQLType = (conn, statement, SQL, SQLType, callback) => {
+    let filterSQLType = (conn, statement, SQL, SQLType, callback, reportSQL) => {
         switch (SQLType) {
             case sqlType.PROCEDURE:
-                executeSQLProcedure(conn, SQL, callback);
+                executeSQLProcedure(conn, SQL, callback, reportSQL);
                 break;
             case sqlType.STATEMENT:
-                executeSQLStatement(conn, statement, SQL, callback);
+                executeSQLStatement(conn, statement, SQL, callback, reportSQL);
                 break;
             case sqlType.SELECT:
-                executeSQLQuery(statement, SQL, callback);
+                executeSQLQuery(statement, SQL, callback, reportSQL);
                 break;
             case sqlType.INSERT_ID:
-                executeSQLInsert(conn, SQL, callback);
+                executeSQLInsert(conn, SQL, callback, reportSQL);
                 break;
             default:
-                executeSQLUpdate(statement, SQL, callback);
+                executeSQLUpdate(statement, SQL, callback, reportSQL);
         }
     };
     return {
@@ -168,6 +169,10 @@ exports = module.exports = () => {
                 drivername: server.typeserver.drivername
             }
             autoCommit = $autoCommit;
+            // Template original (sem valores) usado nos relatórios de erro por e-mail
+            let SQLTemplate = SQL;
+            // Bind vars escapados por dialeto: evita SQL injection na interpolação do template
+            let safeBindVars = sqlEscape.escapeBindVars(bindVars, server.typeserver);
             let _connObj, SQL_DB;
             let closeConnection = () => {
                 if (_connObj) {
@@ -212,15 +217,15 @@ exports = module.exports = () => {
                                     if (err) {
                                         respData.errorResponse(err, callbackBefore);
                                     } else {
-                                        let compiled = _.template(SQL);
-                                        SQL = compiled(bindVars);
+                                        let compiled = _.template(SQLTemplate);
+                                        SQL = compiled(safeBindVars);
                                         //let Connection = java.import('java.sql.Connection');
                                         //conn._conn.setTransactionIsolationSync(Connection.TRANSACTION_READ_UNCOMMITTED);
                                         statement.setFetchSize(numRows, (err) => {
                                             if (err) {
                                                 respData.errorResponse(err, callbackBefore);
                                             } else {
-                                                filterSQLType(conn, statement, SQL, SQLType, callbackBefore);
+                                                filterSQLType(conn, statement, SQL, SQLType, callbackBefore, SQLTemplate);
                                             }
                                         });
                                     }

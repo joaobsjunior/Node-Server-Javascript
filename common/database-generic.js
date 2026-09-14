@@ -1,26 +1,35 @@
 'use strict';
-const ResponseData = require('./response-data');
 const Mailer = require('./mailer');
 const messageEnum = require('./enum/message.enum');
-const AppUtil = require('./app-util');
 let _ = require('lodash');
 
 class DatabaseGeneric {
 
+    /**
+     * SQLReportEmail - Notifica por e-mail um erro de SQL.
+     * Recebe o template do comando (sem os valores interpolados) para que
+     * dados do cliente — como credenciais de login — nunca sejam enviados.
+     */
     static SQLReportEmail(SQL, error) {
-        let dataEmail = {
-            info1: {
-                label: 'Comando SQL',
-                txt: SQL
-            },
-            info2: {
-                label: 'Erro',
-                txt: error.toString()
+        try {
+            let dataEmail = {
+                info1: {
+                    label: 'Comando SQL',
+                    txt: _.escape(String(SQL || ''))
+                },
+                info2: {
+                    label: 'Erro',
+                    txt: _.escape(error && error.message ? error.message : String(error))
+                }
+            };
+            let compile = _.template(messageEnum.msgEmail);
+            let msgEmail = compile(dataEmail);
+            Mailer.send(null, messageEnum.titleErrorConsulta, msgEmail, true);
+        } catch (e) {
+            if (global.log) {
+                global.log.error(e);
             }
-        };
-        let compile = _.template(messageEnum.msgEmail);
-        let msgEmail = compile(dataEmail);
-        Mailer.send(null, messageEnum.titleErrorConsulta, msgEmail, true);
+        }
     }
 
 }

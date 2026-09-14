@@ -59,12 +59,15 @@ function httpOptions () {
         if(req.query.dataParam == undefined || req.query.dataParam == null || req.query.dataParam == '')
             return null;
 
-        if(config.server.debugPosts == true) {
-            return JSON.parse(req.query.dataParam);
-        } else {
-            let bytes  = CryptoJS.AES.decrypt(req.query.dataParam, 'teste');
-            let decryptedData = JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
-            return decryptedData;
+        try {
+            if(config.server.debugPosts == true) {
+                return JSON.parse(req.query.dataParam);
+            }
+            // Chave vinda da configuração (KEY_REQUEST_AUTH), nunca fixa no código
+            let bytes  = CryptoJS.AES.decrypt(String(req.query.dataParam), config.keyRequestAutentication);
+            return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+        } catch (error) {
+            return null;
         }
     };
 

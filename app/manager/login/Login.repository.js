@@ -1,36 +1,38 @@
 'use strict';
 
-// database libs
-//let oracledb = require('oracledb');
-
 // common
 let dbEngine = new require('./../../../common/database-connector')();
 let sqlType = require('../../../common/enum/sqltype.enum');
 const dbConfig = require('../../../config/dbconfig');
-const dbGeneric = require('../../../common/database-generic');
-const messageEnum = require('../../../common/enum/message.enum');
-const ResponseData = require('../../../common/response-data');
-let CryptoJS = require("crypto-js");
-let _ = require('lodash');
+const AuthToken = require('../../../common/auth-token');
 let fs = require('fs');
+let path = require('path');
 
 // model domains
 let Login = require('./Login.model');
 let AppUtil = require('../../../common/app-util');
-let Message = require('../../../common/model/Message.model');
+
+// Comandos SQL lidos uma vez, com caminho absoluto (independente do diretório de execução)
+const SQL_DIR = path.resolve(__dirname, '../../../sql/manager/login');
+const SQL_LOGIN = fs.readFileSync(path.join(SQL_DIR, 'login.sql'), 'utf8');
+const SQL_LOGIN_CHECK = fs.readFileSync(path.join(SQL_DIR, 'login-check.sql'), 'utf8');
 
 class LoginRepository {
   constructor() {}
 
+  /**
+   * loginData - Autentica email/senha e emite o token assinado.
+   * A senha nunca é devolvida ao cliente; o token carrega apenas um
+   * fingerprint HMAC do hash armazenado (ver common/auth-token.js).
+   */
   loginData(login = new Login(), res, callback) {
     let bindVars = AppUtil.clone(login);
 
     function callGet() {
-      let SQL = fs.readFileSync('sql/manager/login/login.sql', 'utf8');
       try {
-        dbEngine.execute(dbConfig.GSENSEX, SQL, sqlType.SELECT, bindVars, callbackDB);
+        dbEngine.execute(dbConfig.GSENSEX, SQL_LOGIN, sqlType.SELECT, bindVars, callbackDB);
       } catch (error) {
-        AppUtil.errorResponse(error, res, 412, callbackError);
+        AppUtil.errorResponse(error, res, 412, callback);
       }
     }
 
@@ -40,16 +42,16 @@ class LoginRepository {
         callback(data);
         return;
       }
-      let loginData = {
-        email: data.response[0].email,
-        password: data.response[0].password
-      }
-      let token = CryptoJS.AES.encrypt(JSON.stringify(loginData), global.config.keyRequestAutentication).toString();
+      let user = data.response[0];
+      let token = AuthToken.sign({
+        email: user.email,
+        passwordHash: user.password
+      });
       let dataResponse = {
-        id: data.response[0].idadministrator,
-        email: data.response[0].email,
-        name: data.response[0].name,
-        level: data.response[0].level,
+        id: user.idadministrator,
+        email: user.email,
+        name: user.name,
+        level: user.level,
         token: token
       }
       data.response = dataResponse;
@@ -59,25 +61,18 @@ class LoginRepository {
     callGet();
   }
 
+  /**
+   * checkLogin - Busca o usuário pelo email para validação do token.
+   */
   checkLogin(login = new Login(), res, callback) {
-    let bindVars = AppUtil.clone(login);
+    let bindVars = { email: login.email };
 
     function callGet() {
-      let SQL = fs.readFileSync('sql/manager/login/login-check.sql', 'utf8');
       try {
-        dbEngine.execute(dbConfig.GSENSEX, SQL, sqlType.SELECT, bindVars, callbackDB);
+        dbEngine.execute(dbConfig.GSENSEX, SQL_LOGIN_CHECK, sqlType.SELECT, bindVars, callback);
       } catch (error) {
-        AppUtil.errorResponse(error, res, 412, callbackError);
+        AppUtil.errorResponse(error, res, 412, callback);
       }
-    }
-
-    //CALLBACKDB
-    function callbackDB(data) {
-      if (!data.isSuccess || !data.response) {
-        callback(data);
-        return;
-      }
-      callback(data);
     }
 
     callGet();

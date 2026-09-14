@@ -2,11 +2,9 @@
 const routeCreator = require('./../../common/route-creator')();
 
 let AppUtil = require('./../../common/app-util');
-let Response = require('./../../common/model/Response.model');
 let ResponseData = require('./../../common/response-data');
 const messageEnum = require('./../../common/enum/message.enum');
 let _ = require('lodash');
-let fs = require('fs');
 
 class CEPService {
 
@@ -19,6 +17,17 @@ class CEPService {
 
 		//LIST
 		this._getAddress = (req, res) => {
+			// Aceita apenas CEP numérico (8 dígitos, com ou sem hífen); evita injeção no envelope SOAP
+			let zipCode = String(req.params.zipCode || '').replace(/-/g, '');
+			if (!/^\d{8}$/.test(zipCode)) {
+				res.status(422);
+				ResponseData.errorResponse(new Error('CEP inválido'), (data) => {
+					data.message.setMessage(messageEnum.server412);
+					res.send(data);
+					res.end();
+				});
+				return;
+			}
 			let xml = `
 			<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:hs="http://cliente.bean.master.sigep.bsb.correios.com.br/">
 			<soapenv:Body>
@@ -30,10 +39,10 @@ class CEPService {
 			`;
 			let compiled = _.template(xml);
 			let body = compiled({
-				zipCode: req.params.zipCode
+				zipCode: zipCode
 			});
 			let address = {
-				zipCode: req.params.zipCode
+				zipCode: zipCode
 			};
 			let uri = "https://apps.correios.com.br/SigepMasterJPA/AtendeClienteService/AtendeCliente?wsdl";
 			fetch(uri, {
@@ -41,14 +50,15 @@ class CEPService {
 				body: body,
 				headers: {
 					'Content-Type': 'text/xml; charset=utf-8'
-				}
+				},
+				// Timeout evita requisições penduradas quando o serviço externo não responde
+				signal: AbortSignal.timeout(15000)
 			}).then((response) => response.text()).then((responseBody) => {
 				let faultstring = responseBody.match(/<faultstring>(.*?)<\/faultstring>/);
 				if (faultstring) {
 					let error = new Error(faultstring[1]);
-					console.error(error);
 					ResponseData.errorResponse(error, (data) => {
-						data.message.setMessage(faultstring);
+						data.message.setMessage(faultstring[1]);
 						res.send(data);
 						res.end();
 					});
@@ -64,7 +74,6 @@ class CEPService {
 							res.end();
 						})
 					} catch (error) {
-						console.error(error);
 						ResponseData.errorResponse(error, (data) => {
 							data.message.setMessage(messageEnum.server422);
 							res.send(data);
@@ -73,7 +82,6 @@ class CEPService {
 					}
 				}
 			}).catch((error) => {
-				console.error(error);
 				ResponseData.errorResponse(error, (data) => {
 					data.message.setMessage(messageEnum.server422);
 					res.send(data);

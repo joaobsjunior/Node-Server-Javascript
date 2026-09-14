@@ -3,6 +3,8 @@
 // Example: $ FORCE_COLOR=1 npm start /path/to/your/script.js
 const chalk = require('chalk');
 require('annotation-js');
+// Substitui o populateToService do annotation-js (baseado em eval) por uma versão segura
+require('./common/annotation-populate').install();
 let Route = require('./route/Route');
 global.annotationsDebug = false;
 
@@ -70,7 +72,6 @@ var
 	httpOptions;
 
 let os = require('os');
-const jws = require('jws');
 const mail = require('./common/mailer');
 
 
@@ -106,6 +107,10 @@ function setDependencies() {
 	global.interceptor = interceptor;
 
 	app = express();
+	// Atrás de proxy reverso, TRUST_PROXY permite usar o IP real do cliente (rate limit, logs)
+	if (config.server.trustProxy) {
+		app.set('trust proxy', config.server.trustProxy);
+	}
 
 	// Setting utils
 	utils = require('./utils/utils');
@@ -124,13 +129,23 @@ function configServer() {
 
 	app.use(helmet());
 
+	// Rate limiting global (proteção contra abuso/DoS aplicacional)
+	let limiters = require('./common/rate-limit').create(config.server.rateLimit);
+	app.use(limiters.global);
+
 	// Allowing CORS only for origins listed in CORS_ORIGINS
 	app.use((req, res, next) => {
 		let origin = req.headers.origin;
 		if (origin && config.cors.origins.indexOf(origin) !== -1) {
 			res.header("Access-Control-Allow-Origin", origin);
+			res.header("Vary", "Origin");
 			res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, token");
 			res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE");
+			if (req.method === 'OPTIONS') {
+				// Preflight: responde sem passar pelas rotas
+				res.sendStatus(204);
+				return;
+			}
 		}
 		next();
 	});
@@ -151,10 +166,32 @@ function configServer() {
 	httpOptions.gatewayParam.port = config.gateway.port;
 	httpOptions.gatewayParam.pathBase = '/servico/rest';
 
+	// Limite mais restrito para tentativas de autenticação (força bruta)
+	app.use(httpOptions.getLocalPathPBase() + '/manager/login', limiters.login);
+
 	let Factory = new require('./common/resource-factory')(app, httpOptions);
 
 	/*----------------- ENTRY POINTS -----------------*/
 	let route = Route.factory(Factory);
+
+	// Error handler final: nunca devolve a página HTML padrão do Express (que expõe stack trace)
+	app.use((err, req, res, next) => {
+		if (res.headersSent) {
+			return next(err);
+		}
+		let status = (err && (err.status || err.statusCode)) || 500;
+		if (status < 400 || status > 599) {
+			status = 500;
+		}
+		if (status >= 500) {
+			log.error(err);
+		}
+		let Response = require('./common/model/Response.model');
+		let messageEnum = require('./common/enum/message.enum');
+		let body = new Response();
+		body.message.setMessage(status >= 500 ? messageEnum.server500 : (err.expose && err.message ? err.message : messageEnum.server412));
+		res.status(status).json(body);
+	});
 
 }
 

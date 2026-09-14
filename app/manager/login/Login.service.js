@@ -53,6 +53,12 @@ class LoginService {
 			}
 
 			loginRepository.loginData(login, res, (data) => {
+				if (!data || !data.isSuccess || !data.size) {
+					// Credenciais inválidas ou falha na consulta: nunca 200
+					if (!res.statusCode || res.statusCode === 200) {
+						res.status(data && data.isSuccess ? 401 : 500);
+					}
+				}
 				res.send(data);
 				res.end();
 			});
@@ -92,4 +98,4 @@ class LoginService {
 	}
 }
 
-module.exports = exports = LoginService;
+module.exports = exports = LoginService;

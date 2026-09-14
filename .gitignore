@@ -4,7 +4,7 @@ npm-debug.log
 output-server.log
 .DS_Store
 lock/
-package-lock.json
 *.jmx
 *.log
 .env
+tmp/
