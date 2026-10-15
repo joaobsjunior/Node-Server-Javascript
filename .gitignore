@@ -8,3 +8,5 @@ package-lock.json
 *.jmx
 *.log
 .env
+tmp/
+test/.cache/

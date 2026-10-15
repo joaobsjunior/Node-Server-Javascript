@@ -4,29 +4,34 @@ const nodemailer = require('nodemailer');
 
 class Mailer {
     static send(callback, assunto, mensagem, isHtml = false, para = null, attachments = null) {
-        if (!config.server.mail.sendEmail) {
-            log.warn('mailer', 'Envio de email desabilitado nas configurações: verifique config.js');
+        let mailConfig = config.server.mail;
+        if (!mailConfig.sendEmail) {
+            log.warn('mailer', 'Envio de email desabilitado nas configurações: defina MAIL_USER e MAIL_PASS');
+            if (callback) {
+                callback(false);
+            }
+            return;
         }
 
-        // create reusable transporter object using the default SMTP transport
+        // Transporte SMTP: TLS implícito (MAIL_SECURE=true) ou STARTTLS obrigatório
+        // (MAIL_REQUIRE_TLS, default true). As credenciais nunca trafegam sem criptografia.
         let transporter = nodemailer.createTransport({
-            service: config.server.mail.service,
-            host: config.server.mail.host,
-            port: config.server.mail.port,
-            secure: false,
-            ignoreTLS: true,
+            host: mailConfig.host,
+            port: mailConfig.port,
+            secure: mailConfig.secure,
+            requireTLS: !mailConfig.secure && mailConfig.requireTLS,
             auth: {
-                user: config.server.mail.auth.user,
-                pass: config.server.mail.auth.pass
+                user: mailConfig.auth.user,
+                pass: mailConfig.auth.pass
             }
         });
 
         // setup email data with unicode symbols
         let mailOptions = {
-            from: config.server.mail.overrideFrom,
-            bcc: para || config.server.mail.overrideTo,
-            replyTo: config.server.mail.overrideTo,
-            subject: config.server.mail.subjectPrefix + assunto,
+            from: mailConfig.overrideFrom,
+            bcc: para || mailConfig.overrideTo,
+            replyTo: mailConfig.overrideTo,
+            subject: mailConfig.subjectPrefix + assunto,
         };
         if (isHtml) {
             mailOptions.html = mensagem;
@@ -36,8 +41,6 @@ class Mailer {
         if (attachments) {
             mailOptions.attachments = attachments;
         }
-        //
-        // debug('mailOptions', mailOptions);
 
         // send mail with defined transport object
         transporter.sendMail(mailOptions, (error, info) => {
