@@ -11,6 +11,7 @@ const MESSAGES_ENUM = {
     msg01: 'Erro na autenticação',
     msg02: 'Campo com o tamanho diferente do esperado',
     msg03: 'Autenticado mas não autorizado',
+    msg26: 'Erro ao executar a operação no banco de dados',
     msgEmail: `
     <table width="100%" border="0" cellpadding="5" cellspacing="0" align="center" style="background-color:#e6e6e6;padding:25px;font-size:14px;font-family:'Trebuchet MS', Helvetica, sans-serif">
     <tr>

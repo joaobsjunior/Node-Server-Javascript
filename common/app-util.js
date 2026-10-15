@@ -21,14 +21,19 @@ class AppUtil {
 
     static getParams(req) {
         return new Promise((resolve, reject) => {
-            let params = Object.assign(req.body, req.query);
-            params = Object.assign(params, req.params);
+            let params = AppUtil.mergeParams({}, req.body, req.query, req.params);
             let isFormData = req.headers["content-type"] && req.headers["content-type"].indexOf('multipart/form-data') == 0;
             if (isFormData) {
                 let {
                     IncomingForm
                 } = require('formidable');
-                let form = new IncomingForm();
+                let uploadConfig = (global.config && global.config.server && global.config.server.upload) || {};
+                let form = new IncomingForm({
+                    maxFileSize: uploadConfig.maxFileSize || 10 * 1024 * 1024,
+                    maxFields: uploadConfig.maxFields || 1000,
+                    maxFieldsSize: 2 * 1024 * 1024,
+                    allowEmptyFiles: false
+                });
                 form.parse(req, (err, fields, files) => {
                     if (err) {
                         resolve(params);
@@ -42,7 +47,7 @@ class AppUtil {
                             });
                             return result;
                         };
-                        params = Object.assign(unwrap(fields), unwrap(files));
+                        params = AppUtil.mergeParams({}, unwrap(fields), unwrap(files));
                         resolve(params);
                     }
                 });
@@ -50,6 +55,25 @@ class AppUtil {
                 resolve(params);
             }
         });
+    }
+
+    /**
+     * mergeParams - Copia as propriedades próprias das fontes para o destino,
+     * ignorando chaves que alterariam o protótipo (__proto__, constructor, prototype).
+     */
+    static mergeParams(target, ...sources) {
+        const forbidden = ['__proto__', 'constructor', 'prototype'];
+        sources.forEach((source) => {
+            if (!source || typeof source !== 'object') {
+                return;
+            }
+            Object.keys(source).forEach((key) => {
+                if (forbidden.indexOf(key) === -1) {
+                    target[key] = source[key];
+                }
+            });
+        });
+        return target;
     }
 
     static showParamsNotPresent(arr, bindVars) {
@@ -136,17 +160,19 @@ class AppUtil {
         var bindVars = JSON.parse(JSON.stringify(obj));
         var object = obj.getAnnotations(ANNOTATION, 10);
         _.forEach(object, (value, key) => {
-            var valueObj = eval("bindVars." + key);
+            if (typeof value === 'function') {
+                return;
+            }
+            var valueObj = _.get(bindVars, key);
             if (typeof valueObj == 'string') {
-                eval("bindVars." + key + " = bindVars." + key + ".toUpperCase()");
+                _.set(bindVars, key, valueObj.toUpperCase());
             }
             if (isPROCEDURE) {
                 if (valueObj === null) {
-                    eval("bindVars." + key + " = 'null'");
+                    _.set(bindVars, key, 'null');
                 }
                 if (value.type == 'date' && valueObj) {
-                    valueObj = valueObj.split('T')[0];
-                    eval("bindVars." + key + " = '" + valueObj + "'");
+                    _.set(bindVars, key, String(valueObj).split('T')[0]);
                 }
             }
         });
@@ -336,7 +362,7 @@ class AppUtil {
         });
         lob.on('end', function () {
             //Retorna a string base64 no callback
-            cb(new Buffer(str).toString());
+            cb(Buffer.from(str).toString());
         });
     }
 

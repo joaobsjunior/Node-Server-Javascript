@@ -1,25 +1,32 @@
 'use strict';
 
+// As credenciais (user/password) NÃO fazem parte da URL: são enviadas como
+// propriedades da conexão JDBC (ver common/database-connector.js).
 const DATABASE_ENUM = {
     ORACLEDB: {
-        url: 'jdbc:oracle:thin:${database}/${username}@/${password}/${host}:1521/${service}',
-        drivername: 'oracle.jdbc.OracleDriver'
+        url: 'jdbc:oracle:thin:@//${host}:${port}/${service}',
+        drivername: 'oracle.jdbc.OracleDriver',
+        defaultPort: 1521
     },
     INFORMIX: {
-        url: 'jdbc:informix-sqli://${host}:1528/${database}:user=${username};password=${password}',
-        drivername: 'com.informix.jdbc.IfxDriver'
+        url: 'jdbc:informix-sqli://${host}:${port}/${database}',
+        drivername: 'com.informix.jdbc.IfxDriver',
+        defaultPort: 1528
     },
     MYSQL: {
-        url: 'jdbc:mysql://${host}:3306/${database}?user=${username}&password=${password}',
-        drivername: 'com.mysql.jdbc.Driver'
+        url: 'jdbc:mysql://${host}:${port}/${database}',
+        drivername: 'com.mysql.jdbc.Driver',
+        defaultPort: 3306
     },
     POSTGRESQL: {
-        url: 'jdbc:postgresql://${host}:5432/${database}?user=${username}&password=${password}',
-        drivername: 'org.postgresql.Driver'
+        url: 'jdbc:postgresql://${host}:${port}/${database}',
+        drivername: 'org.postgresql.Driver',
+        defaultPort: 5432
     },
     MARIADB: {
-        url: 'jdbc:mariadb://${host}:3306/${database}?user=${username}&password=${password}',
-        drivername: 'org.mariadb.jdbc.Driver'
+        url: 'jdbc:mariadb://${host}:${port}/${database}',
+        drivername: 'org.mariadb.jdbc.Driver',
+        defaultPort: 3306
     }
 };
 module.exports = exports = DATABASE_ENUM;

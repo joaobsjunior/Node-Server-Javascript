@@ -3,6 +3,8 @@
 // Example: $ FORCE_COLOR=1 npm start /path/to/your/script.js
 const chalk = require('chalk');
 require('annotation-js');
+// Substitui populateToService (baseado em eval) por uma versão segura
+require('./common/safe-populate');
 let Route = require('./route/Route');
 global.annotationsDebug = false;
 
@@ -70,8 +72,8 @@ var
 	httpOptions;
 
 let os = require('os');
-const jws = require('jws');
 const mail = require('./common/mailer');
+const { rateLimit } = require('express-rate-limit');
 
 
 /**
@@ -122,7 +124,19 @@ function setDependencies() {
  */
 function configServer() {
 
+	app.disable('x-powered-by');
+	app.set('trust proxy', config.server.trustProxy);
 	app.use(helmet());
+
+	// Limite global de requisições por IP (RATE_LIMIT_MAX=0 desabilita)
+	if (config.server.rateLimitMax > 0) {
+		app.use(rateLimit({
+			windowMs: config.server.rateLimitWindowMs,
+			limit: config.server.rateLimitMax,
+			standardHeaders: 'draft-7',
+			legacyHeaders: false
+		}));
+	}
 
 	// Allowing CORS only for origins listed in CORS_ORIGINS
 	app.use((req, res, next) => {
@@ -150,6 +164,24 @@ function configServer() {
 	httpOptions.gatewayParam.hostName = config.gateway.hostName;
 	httpOptions.gatewayParam.port = config.gateway.port;
 	httpOptions.gatewayParam.pathBase = '/servico/rest';
+
+	// Proteção contra força bruta no login (RATE_LIMIT_LOGIN_MAX=0 desabilita)
+	if (config.auth.loginRateLimitMax > 0) {
+		app.use(httpOptions.getLocalPathPBase() + '/manager/login', rateLimit({
+			windowMs: config.auth.loginRateLimitWindowMs,
+			limit: config.auth.loginRateLimitMax,
+			standardHeaders: 'draft-7',
+			legacyHeaders: false,
+			message: {
+				isSuccess: false,
+				size: 0,
+				message: {
+					message: 'Muitas tentativas de login. Tente novamente mais tarde.'
+				},
+				response: []
+			}
+		}));
+	}
 
 	let Factory = new require('./common/resource-factory')(app, httpOptions);
 

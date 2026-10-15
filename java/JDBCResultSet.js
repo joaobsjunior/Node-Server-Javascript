@@ -29,7 +29,9 @@ class JDBCResultSet {
                         obj[columnNames[i]] = this.rs.getArraySync(columnNames[i]);
                         break;
                     case sqlTypes.BIGINT:
-                        obj[columnNames[i]] = this.rs.getIntSync(columnNames[i]);
+                        // getInt estoura acima de 2^31 (lançava exceção e derrubava o processo);
+                        // a conversão numérica é feita depois por infereType
+                        obj[columnNames[i]] = this.rs.getStringSync(columnNames[i]);
                         break;
                     case sqlTypes.BOOLEAN:
                         obj[columnNames[i]] = this.rs.getBooleanSync(columnNames[i]);

@@ -1,33 +1,63 @@
 'use strict';
 
-// database libs
-//let oracledb = require('oracledb');
+const crypto = require('crypto');
+const path = require('path');
+let fs = require('fs');
 
 // common
 let dbEngine = new require('./../../../common/database-connector')();
 let sqlType = require('../../../common/enum/sqltype.enum');
 const dbConfig = require('../../../config/dbconfig');
-const dbGeneric = require('../../../common/database-generic');
-const messageEnum = require('../../../common/enum/message.enum');
+const AuthToken = require('../../../common/auth-token');
 const ResponseData = require('../../../common/response-data');
-let CryptoJS = require("crypto-js");
-let _ = require('lodash');
-let fs = require('fs');
 
 // model domains
 let Login = require('./Login.model');
 let AppUtil = require('../../../common/app-util');
-let Message = require('../../../common/model/Message.model');
+
+const SQL_DIR = path.resolve(__dirname, '../../../sql/manager/login');
+
+/**
+ * passwordFingerprint - Resumo (SHA-256) do hash armazenado da senha.
+ * Vai no token apenas para invalidar sessões quando a senha for alterada;
+ * não permite recuperar a senha nem o hash original.
+ */
+function passwordFingerprint(storedHash) {
+  return crypto.createHash('sha256').update(String(storedHash === undefined || storedHash === null ? '' : storedHash)).digest('hex');
+}
+
+function safeEqual(a, b) {
+  let bufA = Buffer.from(String(a || ''));
+  let bufB = Buffer.from(String(b || ''));
+  if (bufA.length !== bufB.length) {
+    return false;
+  }
+  return crypto.timingSafeEqual(bufA, bufB);
+}
+
+function readSQL(fileName) {
+  return fs.readFileSync(path.join(SQL_DIR, fileName), 'utf8');
+}
 
 class LoginRepository {
   constructor() {}
 
+  /**
+   * loginData - Autentica e-mail/senha e emite o token de acesso.
+   */
   loginData(login = new Login(), res, callback) {
-    let bindVars = AppUtil.clone(login);
+    let bindVars = {
+      email: login.email,
+      password: login.password
+    };
+
+    function callbackError(data) {
+      callback(data);
+    }
 
     function callGet() {
-      let SQL = fs.readFileSync('sql/manager/login/login.sql', 'utf8');
       try {
+        let SQL = readSQL('login.sql');
         dbEngine.execute(dbConfig.GSENSEX, SQL, sqlType.SELECT, bindVars, callbackDB);
       } catch (error) {
         AppUtil.errorResponse(error, res, 412, callbackError);
@@ -40,16 +70,18 @@ class LoginRepository {
         callback(data);
         return;
       }
-      let loginData = {
-        email: data.response[0].email,
-        password: data.response[0].password
-      }
-      let token = CryptoJS.AES.encrypt(JSON.stringify(loginData), global.config.keyRequestAutentication).toString();
+      let row = data.response[0];
+      let token = AuthToken.sign({
+        sub: row.idadministrator,
+        email: row.email,
+        level: row.level,
+        fp: passwordFingerprint(row.password)
+      });
       let dataResponse = {
-        id: data.response[0].idadministrator,
-        email: data.response[0].email,
-        name: data.response[0].name,
-        level: data.response[0].level,
+        id: row.idadministrator,
+        email: row.email,
+        name: row.name,
+        level: row.level,
         token: token
       }
       data.response = dataResponse;
@@ -59,12 +91,22 @@ class LoginRepository {
     callGet();
   }
 
-  checkLogin(login = new Login(), res, callback) {
-    let bindVars = AppUtil.clone(login);
+  /**
+   * checkLogin - Valida as claims de um token já verificado: o usuário precisa
+   * existir e a senha não pode ter sido alterada desde a emissão do token.
+   */
+  checkLogin(claims = {}, res, callback) {
+    let bindVars = {
+      email: claims.email
+    };
+
+    function callbackError(data) {
+      callback(data);
+    }
 
     function callGet() {
-      let SQL = fs.readFileSync('sql/manager/login/login-check.sql', 'utf8');
       try {
+        let SQL = readSQL('login-check.sql');
         dbEngine.execute(dbConfig.GSENSEX, SQL, sqlType.SELECT, bindVars, callbackDB);
       } catch (error) {
         AppUtil.errorResponse(error, res, 412, callbackError);
@@ -73,9 +115,15 @@ class LoginRepository {
 
     //CALLBACKDB
     function callbackDB(data) {
-      if (!data.isSuccess || !data.response) {
+      if (!data.isSuccess || !data.size) {
         callback(data);
         return;
+      }
+      let row = data.response[0];
+      let valid = row && safeEqual(passwordFingerprint(row.password), claims.fp);
+      if (!valid) {
+        data.size = null;
+        data.response = [];
       }
       callback(data);
     }

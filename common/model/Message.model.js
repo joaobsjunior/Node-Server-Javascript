@@ -1,5 +1,4 @@
 'use strict';
-let _ = require('lodash');
 
 class Message {
     constructor(id = null, code = null, message = null, dateException = new Date(), nameCurrentResource = null, additionalInformation = null) {
@@ -12,11 +11,12 @@ class Message {
     }
 
     setMessage(msgEnum, value) {
-        if (msgEnum && value) {
-            let compiler = _.template(msgEnum);
-            this.message = compiler({
-                value: value
-            });
+        if (msgEnum && value !== undefined && value !== null && typeof msgEnum === 'string') {
+            // Interpolação simples de <%= value %> / ${value}, sem compilar templates
+            // (lodash.template executa código arbitrário presente no texto).
+            this.message = msgEnum
+                .replace(/<%[-=]?\s*value\s*%>/g, String(value))
+                .replace(/\$\{\s*value\s*\}/g, String(value));
             return;
         }
         this.message = msgEnum;
